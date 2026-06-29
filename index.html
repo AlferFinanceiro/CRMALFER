@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alfer — Sistema de Gestão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--v:#155126;--l:#afcb34;--c:#c8d384;--bg:#f4f6f0;--card:#fff;--border:#e0e5d8;--txt:#1a1a1a;--txt2:#5a6a52;--txt3:#8a9a82}
+body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;font-size:14px}
+.topbar{background:var(--v);color:#fff;padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(21,81,38,.18)}
+.logo{width:34px;height:34px;border-radius:50%;background:var(--l);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:var(--v);flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700;flex:1}
+.nav{display:flex;gap:2px;overflow-x:auto;padding:0 24px;background:var(--v);border-top:1px solid rgba(255,255,255,.1)}
+.nav-btn{padding:10px 14px;border:none;background:transparent;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;display:flex;align-items:center;gap:5px;font-family:inherit}
+.nav-btn.active,.nav-btn:hover{color:#fff;border-bottom-color:var(--l);background:rgba(255,255,255,.06)}
+.main{max-width:960px;margin:0 auto;padding:20px 16px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:700;color:var(--v);margin-bottom:14px;display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:2px solid var(--c)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:560px){.grid2,.grid3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.field input,.field select,.field textarea{padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:13px;background:#fff;color:var(--txt);width:100%;font-family:inherit;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--l)}
+.field textarea{resize:vertical;min-height:70px}
+.btn{padding:9px 18px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;border:none;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-v{background:var(--v);color:#fff}.btn-v:hover{background:#1a6830}
+.btn-l{background:var(--l);color:var(--v)}.btn-l:hover{background:var(--c)}
+.btn-ghost{background:transparent;color:var(--v);border:1.5px solid var(--v)}.btn-ghost:hover{background:var(--v);color:#fff}
+.btn-danger{background:#fce4ec;color:#880e4f;border:none}.btn-danger:hover{background:#f8bbd0}
+.btn-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.kpi-v{font-size:17px;font-weight:800;color:var(--v)}.kpi-l{font-size:10px;color:var(--txt3);margin-top:2px;font-weight:600;text-transform:uppercase}
+.search-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-row input,.search-row select{padding:8px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:13px;background:#fff;color:var(--txt);font-family:inherit}
+.search-row input{flex:1;min-width:140px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;cursor:pointer;transition:border .15s}
+.item:hover,.item.sel{border-color:var(--l);border-width:1.5px}
+.item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item-name{font-size:14px;font-weight:700;color:var(--v)}
+.item-sub{font-size:11px;color:var(--txt3);margin-top:1px}
+.item-val{font-size:14px;font-weight:800;color:var(--v);white-space:nowrap}
+.item-venc{font-size:10px;color:var(--txt3);text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.tag-resp{background:#e8f0d0;color:#155126}
+.tag-tipo{background:#e3f2fd;color:#1565c0}
+.tag-sis{background:#fff3e0;color:#e65100}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.b-ativo{background:#e8f5e9;color:#2e7d32}.b-prosp{background:#e3f2fd;color:#1565c0}.b-inativo{background:#fce4ec;color:#880e4f}
+.b-warn{background:#fff3e0;color:#e65100}.b-ok{background:#e8f5e9;color:#2e7d32}
+.notif{padding:10px 14px;border-radius:9px;font-size:12px;margin-bottom:12px;font-weight:600}
+.notif-ok{background:#e8f5e9;color:#2e7d32;border-left:4px solid #4caf50}
+.notif-warn{background:#fff3e0;color:#e65100;border-left:4px solid #ff9800}
+.sep{height:1px;background:var(--border);margin:14px 0}
+.mini-lbl{font-size:10px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.detail-box{background:#fff;border:2px solid var(--v);border-radius:14px;padding:18px;margin-top:10px}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-bottom:12px}
+.meta-item .mv{font-size:13px;font-weight:700;color:var(--txt)}
+.result-box{background:var(--v);color:#fff;border-radius:12px;padding:18px;margin-top:14px;text-align:center}
+.result-val{font-size:30px;font-weight:800;color:var(--l);margin:4px 0}
+.result-sub{font-size:12px;opacity:.8}
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.emp-avatar{width:40px;height:40px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--v);flex-shrink:0}
+.task-item{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:9px;background:var(--bg);font-size:12px;margin-bottom:6px}
+.task-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tipos-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tipo-btn{padding:7px 14px;border-radius:20px;border:2px solid var(--border);background:#fff;color:var(--txt2);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.tipo-btn.sel{border-color:var(--v);background:var(--v);color:#fff}
+.tipo-btn:hover:not(.sel){border-color:var(--l);color:var(--v)}
+.add-tipo-row{display:flex;gap:6px;margin-top:10px}
+.add-tipo-row input{flex:1;padding:8px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:12px;font-family:inherit}
+.add-tipo-row button{padding:8px 14px;border-radius:9px;background:var(--l);color:var(--v);border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px}
+.section-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:700;background:var(--c);color:var(--v);margin-bottom:10px;letter-spacing:.3px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">A</div>
+  <div style="flex:1"><div class="topbar-title">Alfer — Sistema de Gestão de Clientes</div></div>
+  <div id="topFat" style="font-size:12px;opacity:.85;font-weight:700"></div>
+</div>
+<div class="nav">
+  <button class="nav-btn active" onclick="setTab('clientes',this)"><i class="ti ti-building-store"></i> Clientes</button>
+  <button class="nav-btn" onclick="setTab('novo',this)"><i class="ti ti-plus"></i> Novo Cliente</button>
+  <button class="nav-btn" onclick="setTab('calc',this)"><i class="ti ti-calculator"></i> Precificação</button>
+  <button class="nav-btn" onclick="setTab('alfer',this)"><i class="ti ti-home"></i> Alfer Interna</button>
+  <button class="nav-btn" onclick="setTab('equipe',this)"><i class="ti ti-users"></i> Equipe</button>
+</div>
+<div class="main">
+
+<!-- CLIENTES -->
+<div id="panel-clientes" class="panel active">
+  <div class="kpi-row" id="kpiClientes"></div>
+  <div class="search-row">
+    <input type="text" placeholder="Buscar cliente, segmento..." oninput="renderClientes()" id="busca">
+    <select onchange="renderClientes()" id="filtroResp"><option value="">Todos responsáveis</option></select>
+    <select onchange="renderClientes()" id="filtroTipo"><option value="">Todos os serviços</option></select>
+    <select onchange="renderClientes()" id="filtroStatus">
+      <option value="">Todos status</option><option value="ativo">Ativo</option><option value="prospecto">Prospecto</option><option value="inativo">Inativo</option>
+    </select>
+    <select onchange="renderClientes()" id="filtroClass"><option value="">Todas classificações</option></select>
+  </div>
+  <div class="list" id="listaClientes"></div>
+  <div id="clienteDetalhe"></div>
+</div>
+
+<!-- NOVO CLIENTE -->
+<div id="panel-novo" class="panel">
+<div class="card">
+  <div class="card-title"><i class="ti ti-user-plus"></i> Cadastrar Novo Cliente</div>
+  <div id="notifNovo"></div>
+  <div class="grid2">
+    <div class="field"><label>Razão Social / Nome *</label><input id="n_nome" placeholder="Ex: Lambreta Bistrô"></div>
+    <div class="field"><label>CNPJ / CPF</label><input id="n_cnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="field"><label>Responsável *</label><select id="n_resp"></select></div>
+    <div class="field"><label>Status *</label><select id="n_status"><option value="ativo">Ativo</option><option value="prospecto">Prospecto</option><option value="inativo">Inativo</option></select></div>
+    <div class="field"><label>Mensalidade (R$)</label><input id="n_valor" type="number" placeholder="0,00" min="0"></div>
+    <div class="field"><label>Segmento / Ramo</label><input id="n_seg" placeholder="Ex: Alimentação, Saúde, Varejo..."></div>
+    <div class="field"><label>Sistema Principal</label>
+      <select id="n_sistema"><option value="">— Não informado —</option><option>Omie</option><option>ContaAzul</option><option>Nibo</option><option>SAP</option><option>Outro</option></select></div>
+    <div class="field"><label>Nº de CNPJs / Empresas</label><input id="n_cnpjs" type="number" placeholder="1" min="1" value="1"></div>
+    <div class="field"><label>Data de Início do Contrato</label><input id="n_inicio" type="date"></div>
+    <div class="field"><label>Dia de Vencimento</label><input id="n_venc" type="number" placeholder="Ex: 5" min="1" max="31"></div>
+    <div class="field"><label>Classificação</label><select id="n_class"></select></div>
+  </div>
+  <div class="sep"></div>
+  <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:4px;display:flex;align-items:center;gap:6px"><i class="ti ti-briefcase"></i> Tipo de Serviço Contratado *</div>
+  <p style="font-size:11px;color:var(--txt3);margin-bottom:8px">Selecione um ou mais. Use "+ Novo tipo" para criar serviços personalizados.</p>
+  <div class="tipos-wrap" id="tiposBtns"></div>
+  <div class="add-tipo-row">
+    <input id="novoTipoInput" placeholder="Nome do novo tipo de serviço..." onkeydown="if(event.key==='Enter')adicionarTipo()">
+    <button onclick="adicionarTipo()"><i class="ti ti-plus"></i> Novo tipo</button>
+  </div>
+  <div class="sep"></div>
+  <div class="field"><label>Escopo / Observações</label><textarea id="n_obs" placeholder="Descreva o escopo contratado, particularidades..."></textarea></div>
+  <div class="field" style="margin-top:10px"><label>Arquivo do Contrato</label><input id="n_contrato" placeholder="Ex: Contrato_Lambreta_Jun2026.pdf"></div>
+  <div class="field" style="margin-top:6px"><label>Link do Contrato (Google Drive)</label><input id="n_link" placeholder="https://drive.google.com/..."></div>
+  <div class="btn-row">
+    <button class="btn btn-v" onclick="salvarCliente()"><i class="ti ti-device-floppy"></i> Salvar Cliente</button>
+    <button class="btn btn-l" onclick="document.querySelectorAll('.nav-btn')[2].click()"><i class="ti ti-calculator"></i> Calcular Honorários</button>
+    <button class="btn btn-ghost" onclick="limparForm()"><i class="ti ti-refresh"></i> Limpar</button>
+  </div>
+</div>
+</div>
+
+<!-- PRECIFICAÇÃO -->
+<div id="panel-calc" class="panel">
+<div class="card">
+  <div class="card-title"><i class="ti ti-calculator"></i> Calculadora de Honorários BPO</div>
+  <p style="font-size:12px;color:var(--txt2);margin-bottom:16px">Baseada na planilha BPOCLASS. Preencha os dados do lead para calcular o ticket ideal.</p>
+  <div class="section-tag">Volumetria do Cliente</div>
+  <div class="grid3">
+    <div class="field"><label>Contas a Pagar/mês</label><input type="number" id="c_pagar" value="50" oninput="calcular()"></div>
+    <div class="field"><label>Contas a Receber/mês</label><input type="number" id="c_receber" value="50" oninput="calcular()"></div>
+    <div class="field"><label>Contas bancárias</label><input type="number" id="c_bancos" value="2" oninput="calcular()"></div>
+    <div class="field"><label>Contas de aplicação</label><input type="number" id="c_aplic" value="1" oninput="calcular()"></div>
+    <div class="field"><label>Adquirentes de cartão</label><input type="number" id="c_cartoes" value="1" oninput="calcular()"></div>
+    <div class="field"><label>Notas fiscais/mês</label><input type="number" id="c_notas" value="10" oninput="calcular()"></div>
+    <div class="field"><label>Boletos/mês</label><input type="number" id="c_boletos" value="10" oninput="calcular()"></div>
+    <div class="field"><label>Horas relatórios/mês</label><input type="number" id="c_relat" value="1" oninput="calcular()"></div>
+    <div class="field"><label>Horas reunião consultiva</label><input type="number" id="c_reun" value="1" oninput="calcular()"></div>
+  </div>
+  <div class="grid2" style="margin-top:8px">
+    <div class="field"><label>Centro de custo / rateio?</label><select id="c_cc" onchange="calcular()"><option value="nao">Não</option><option value="sim">Sim (+30%)</option></select></div>
+    <div class="field"><label>Departamento / projetos?</label><select id="c_dep" onchange="calcular()"><option value="nao">Não</option><option value="sim">Sim (+20%)</option></select></div>
+  </div>
+  <div class="sep"></div>
+  <div class="section-tag">Parâmetros da Operação</div>
+  <div class="grid3">
+    <div class="field"><label>Preço por hora (R$)</label><input type="number" id="c_hora" value="121.21" oninput="calcular()"></div>
+    <div class="field"><label>Margem de lucro</label>
+      <select id="c_margem" onchange="calcular()">
+        <option value="1.5">1,5x — Básico</option>
+        <option value="1.8" selected>1,8x — Intermediário</option>
+        <option value="2.2">2,2x — Avançado</option>
+      </select></div>
+    <div class="field"><label>Min/lançamento</label><input type="number" id="c_min" value="3" oninput="calcular()"></div>
+  </div>
+  <div id="resultadoCalc"></div>
+  <div class="btn-row">
+    <button class="btn btn-v" onclick="usarCalcNoNovo()"><i class="ti ti-arrow-right"></i> Usar este valor em Novo Cliente</button>
+  </div>
+</div>
+</div>
+
+<!-- ALFER INTERNA -->
+<div id="panel-alfer" class="panel">
+<div class="card">
+  <div class="card-title"><i class="ti ti-home"></i> Alfer — Dados da Empresa</div>
+  <div id="notifAlfer"></div>
+  <div class="grid2">
+    <div class="field"><label>Razão Social</label><input value="Alfer Gestão Financeira Estratégica" readonly style="opacity:.6"></div>
+    <div class="field"><label>CNPJ</label><input value="49.015.525/0001-90" readonly style="opacity:.6"></div>
+    <div class="field"><label>Sócia / Representante</label><input id="a_socia" value="Fernanda Alvarenga Cavalcante"></div>
+    <div class="field"><label>Cidade / Estado</label><input id="a_cidade" value="Goiânia / GO"></div>
+    <div class="field"><label>Telefone / WhatsApp</label><input id="a_tel" placeholder="(62) 9..."></div>
+    <div class="field"><label>E-mail Comercial</label><input id="a_email" placeholder="contato@alfer.com.br"></div>
+    <div class="field"><label>Meta de Faturamento Mensal (R$)</label><input id="a_meta" type="number" placeholder="50000"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="card-title" style="font-size:12px;border-bottom:none;padding-bottom:0;margin-bottom:10px"><i class="ti ti-chart-bar"></i> Faturamento por Serviço</div>
+  <div class="kpi-row" id="kpiAlfer"></div>
+  <div class="sep"></div>
+  <div class="field"><label>Anotações / Pendências Internas</label><textarea id="a_pend" rows="4" placeholder="Contratos a renovar, pendências fiscais, tarefas administrativas..."></textarea></div>
+  <div class="btn-row"><button class="btn btn-v" onclick="salvarAlfer()"><i class="ti ti-device-floppy"></i> Salvar</button></div>
+</div>
+<div class="card">
+  <div class="card-title"><i class="ti ti-users"></i> Gerenciar Responsáveis / Analistas</div>
+  <p style="font-size:12px;color:var(--txt2);margin-bottom:10px">Adicione ou remova analistas. Eles aparecem na lista de responsáveis do cadastro.</p>
+  <div class="tipos-wrap" id="respBtns"></div>
+  <div class="add-tipo-row" style="margin-top:10px">
+    <input id="novoRespInput" placeholder="Nome do novo analista..." onkeydown="if(event.key==='Enter')adicionarResp()">
+    <button onclick="adicionarResp()"><i class="ti ti-plus"></i> Adicionar</button>
+  </div>
+</div>
+</div>
+
+<!-- EQUIPE -->
+<div id="panel-equipe" class="panel">
+<div class="card">
+  <div class="card-title"><i class="ti ti-user-plus"></i> Adicionar Membro da Equipe</div>
+  <div id="notifEquipe"></div>
+  <div class="grid2">
+    <div class="field"><label>Nome Completo *</label><input id="e_nome" placeholder="Nome da colaboradora"></div>
+    <div class="field"><label>Cargo</label>
+      <select id="e_cargo"><option>Analista Financeiro</option><option>Assistente Financeiro</option><option>Auxiliar Financeiro</option><option>Analista DP</option><option>Coordenadora</option><option>Sócia</option></select></div>
+    <div class="field"><label>Vínculo</label>
+      <select id="e_contrato"><option value="CLT">CLT</option><option value="PJ">PJ</option><option value="Estágio">Estágio</option><option value="Sócia">Sócia</option></select></div>
+    <div class="field"><label>Data de Nascimento</label><input id="e_nasc" type="date"></div>
+    <div class="field"><label>Data de Admissão</label><input id="e_admissao" type="date"></div>
+    <div class="field"><label>CPF</label><input id="e_cpf" placeholder="000.000.000-00"></div>
+    <div class="field"><label>E-mail</label><input id="e_email" placeholder="nome@alfer.com.br"></div>
+    <div class="field"><label>WhatsApp</label><input id="e_wpp" placeholder="(62) 9..."></div>
+    <div class="field"><label>Salário / Honorário (R$)</label><input id="e_sal" type="number" placeholder="0"></div>
+    <div class="field"><label>Clientes sob Responsabilidade</label><input id="e_clientes" placeholder="Lambreta, JH, Amoreco..."></div>
+  </div>
+  <div class="field" style="margin-top:8px"><label>Observações / Benefícios</label><textarea id="e_obs" placeholder="VT, VR, plano de saúde, férias previstas, contrato PJ nº..."></textarea></div>
+  <div class="btn-row"><button class="btn btn-v" onclick="salvarFuncionario()"><i class="ti ti-user-plus"></i> Adicionar à Equipe</button></div>
+</div>
+<div class="card">
+  <div class="card-title"><i class="ti ti-id-badge"></i> Membros da Equipe</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px" id="listaEquipe"></div>
+</div>
+</div>
+
+</div>
+<script>
+const DEF_TIPOS=['BPO Financeiro','Departamento Pessoal','Mentoria','Cobrança'];
+const DEF_CLASS=['⭐ Básico','⭐⭐ Intermediário','⭐⭐⭐ Avançado','💎 Premium'];
+const DEF_RESP=['Aline','Vanessa','Nathalia','Karol','Fernanda'];
+const DEF_CLIENTES=[
+  {id:1,nome:'Lambreta',cnpj:'',resp:'Aline',valor:1500,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'Alimentação',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:2,nome:'Alvorada',cnpj:'',resp:'Aline',valor:1621,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:3,nome:'Amoreco',cnpj:'',resp:'Aline',valor:1500,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:4,nome:'JH Elevadores',cnpj:'',resp:'Aline',valor:2000,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'Serviços',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'Contrato_JH_Alfer.docx',link:'',pendencias:[]},
+  {id:5,nome:'Ranchos 30',cnpj:'',resp:'Vanessa',valor:2700,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐⭐⭐ Avançado',seg:'Hotelaria',inicio:'',venc:5,cnpjs:1,obs:'Dashboard publicado',contrato:'',link:'',pendencias:[]},
+  {id:6,nome:'Veed',cnpj:'',resp:'Vanessa',valor:1000,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:7,nome:'PD1',cnpj:'',resp:'Vanessa',valor:2000,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:8,nome:'Pumb',cnpj:'',resp:'Vanessa',valor:865,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:9,nome:'Favorita',cnpj:'',resp:'Vanessa',valor:1720,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:10,nome:'Bardan',cnpj:'',resp:'Nathalia',valor:2090,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:11,nome:'Bronzear',cnpj:'',resp:'Nathalia',valor:1621,tipos:['BPO Financeiro','Cobrança'],sistema:'Nibo',status:'ativo',class:'⭐⭐ Intermediário',seg:'Estética',inicio:'',venc:5,cnpjs:1,obs:'Skill sipag-nibo ativa',contrato:'',link:'',pendencias:[]},
+  {id:12,nome:'Jaspe',cnpj:'',resp:'Nathalia',valor:2000,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:13,nome:'Ingrid Gomes',cnpj:'',resp:'Nathalia',valor:400,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'Importação faturas C6 Bank',contrato:'',link:'',pendencias:['Importar fatura Maio/2026']},
+  {id:14,nome:'Grupo Inove',cnpj:'',resp:'Karol',valor:2750,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'💎 Premium',seg:'Indústria',inicio:'',venc:5,cnpjs:3,obs:'LS, INOVE, DL — 3 empresas',contrato:'',link:'',pendencias:[]},
+  {id:15,nome:'PAWA Marine',cnpj:'',resp:'Karol',valor:1621,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'Náutica',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:16,nome:'Teclub',cnpj:'',resp:'Fernanda',valor:2350,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:17,nome:'Emporio Body',cnpj:'',resp:'Fernanda',valor:1621,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:18,nome:'Bronzear DP',cnpj:'',resp:'Fernanda',valor:810,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'Estética',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:19,nome:'Bardan DP',cnpj:'',resp:'Fernanda',valor:810,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:20,nome:'Stint',cnpj:'',resp:'Fernanda',valor:2000,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:21,nome:'Pumb Cobr',cnpj:'',resp:'Fernanda',valor:320,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:22,nome:'Amoreco Cobr',cnpj:'',resp:'Fernanda',valor:1000,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:23,nome:'Lambreta Cobr',cnpj:'',resp:'Fernanda',valor:1500,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'Alimentação',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+  {id:24,nome:'PD1 Cobr',cnpj:'',resp:'Fernanda',valor:800,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:'',pendencias:[]},
+];
+const DEF_EQUIPE=[
+  {nome:'Fernanda Alvarenga',cargo:'Sócia',contrato:'Sócia',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:0,clientes:'Gestão geral / Cobrança / DP',obs:'CNPJ 49.015.525/0001-90'},
+  {nome:'Aline',cargo:'Analista Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:2000,clientes:'Lambreta, Alvorada, Amoreco, JH',obs:''},
+  {nome:'Vanessa',cargo:'Analista Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:2000,clientes:'Ranchos, Veed, PD1, Pumb, Favorita',obs:''},
+  {nome:'Nathalia',cargo:'Analista Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:2000,clientes:'Bardan, Bronzear, Jaspe, Ingrid',obs:''},
+  {nome:'Anna Karollynny',cargo:'Analista Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:2000,clientes:'Grupo Inove, PAWA Marine',obs:''},
+  {nome:'Aryelli',cargo:'Assistente Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:0,clientes:'',obs:''},
+  {nome:'Raissa',cargo:'Assistente Financeiro',contrato:'',nasc:'',admissao:'',cpf:'',email:'',wpp:'',sal:0,clientes:'',obs:''},
+];
+function ld(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+let clientes=ld('alfer_clientes')||DEF_CLIENTES;
+let equipe=ld('alfer_equipe')||DEF_EQUIPE;
+let tipos=ld('alfer_tipos')||[...DEF_TIPOS];
+let classes=ld('alfer_classes')||[...DEF_CLASS];
+let resps=ld('alfer_resps')||[...DEF_RESP];
+let tiposSel=[];
+let selId=null;
+let ultimoCalc=0;
+function sv(){['clientes','equipe','tipos','classes','resps'].forEach(k=>localStorage.setItem('alfer_'+k,JSON.stringify(eval(k))));}
+function fmt(v){return'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}
+function setTab(t,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(t==='clientes'){renderClientes();populateFilters();}
+  if(t==='novo'){renderTiposBtns();populateSelects();}
+  if(t==='calc')calcular();
+  if(t==='alfer'){renderAlfer();renderRespBtns();}
+  if(t==='equipe')renderEquipe();
+}
+function populateFilters(){
+  const fr=document.getElementById('filtroResp'),ft=document.getElementById('filtroTipo'),fc=document.getElementById('filtroClass');
+  const vr=fr.value,vt=ft.value,vc=fc.value;
+  fr.innerHTML='<option value="">Todos responsáveis</option>'+resps.map(r=>`<option${vr===r?' selected':''}>${r}</option>`).join('');
+  ft.innerHTML='<option value="">Todos os serviços</option>'+tipos.map(t=>`<option${vt===t?' selected':''}>${t}</option>`).join('');
+  fc.innerHTML='<option value="">Todas classificações</option>'+classes.map(c=>`<option${vc===c?' selected':''}>${c}</option>`).join('');
+}
+function populateSelects(){
+  const nr=document.getElementById('n_resp'),nc=document.getElementById('n_class');
+  if(nr)nr.innerHTML=resps.map(r=>`<option>${r}</option>`).join('');
+  if(nc)nc.innerHTML=classes.map(c=>`<option>${c}</option>`).join('');
+}
+function renderTiposBtns(){
+  const w=document.getElementById('tiposBtns');
+  if(!w)return;
+  w.innerHTML=tipos.map(t=>`<button class="tipo-btn${tiposSel.includes(t)?' sel':''}" onclick="toggleTipo('${t.replace(/'/g,"\\'")}')"><i class="ti ti-check" style="display:${tiposSel.includes(t)?'inline':'none'}"></i> ${t}</button>`).join('');
+}
+function toggleTipo(t){tiposSel=tiposSel.includes(t)?tiposSel.filter(x=>x!==t):[...tiposSel,t];renderTiposBtns();}
+function adicionarTipo(){
+  const v=document.getElementById('novoTipoInput').value.trim();
+  if(!v||tipos.includes(v))return;
+  tipos.push(v);sv();
+  document.getElementById('novoTipoInput').value='';
+  renderTiposBtns();populateFilters();
+}
+function renderRespBtns(){
+  const w=document.getElementById('respBtns');
+  if(!w)return;
+  w.innerHTML=resps.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;background:#e8f0d0;color:var(--v);font-size:12px;font-weight:700">${r}<button onclick="remResp(${i})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;line-height:1">×</button></span>`).join('');
+}
+function adicionarResp(){
+  const v=document.getElementById('novoRespInput').value.trim();
+  if(!v||resps.includes(v))return;
+  resps.push(v);sv();
+  document.getElementById('novoRespInput').value='';
+  renderRespBtns();populateFilters();populateSelects();
+}
+function remResp(i){if(!confirm('Remover '+resps[i]+'?'))return;resps.splice(i,1);sv();renderRespBtns();populateFilters();populateSelects();}
+function renderClientes(){
+  const q=(document.getElementById('busca')||{value:''}).value.toLowerCase();
+  const fr=(document.getElementById('filtroResp')||{value:''}).value;
+  const ft=(document.getElementById('filtroTipo')||{value:''}).value;
+  const fs=(document.getElementById('filtroStatus')||{value:''}).value;
+  const fc=(document.getElementById('filtroClass')||{value:''}).value;
+  const list=clientes.filter(c=>{
+    return(c.nome.toLowerCase().includes(q)||(c.seg||'').toLowerCase().includes(q))
+      &&(!fr||c.resp===fr)&&(!ft||(c.tipos||[]).includes(ft))
+      &&(!fs||c.status===fs)&&(!fc||c.class===fc);
+  });
+  const tot=list.reduce((s,c)=>s+Number(c.valor),0);
+  const pend=list.filter(c=>c.pendencias&&c.pendencias.length>0).length;
+  const semCt=list.filter(c=>!c.contrato&&c.status==='ativo').length;
+  document.getElementById('kpiClientes').innerHTML=`
+    <div class="kpi"><div class="kpi-v">${list.length}</div><div class="kpi-l">Clientes</div></div>
+    <div class="kpi"><div class="kpi-v">${list.filter(c=>c.status==='ativo').length}</div><div class="kpi-l">Ativos</div></div>
+    <div class="kpi"><div class="kpi-v">${fmt(tot)}</div><div class="kpi-l">Faturamento</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:${pend>0?'#e65100':'var(--v)'}">${pend}</div><div class="kpi-l">Com pendências</div></div>
+    <div class="kpi"><div class="kpi-v" style="color:${semCt>0?'#880e4f':'var(--v)'}">${semCt}</div><div class="kpi-l">Sem contrato</div></div>`;
+  document.getElementById('topFat').textContent=fmt(clientes.filter(c=>c.status==='ativo').reduce((s,c)=>s+Number(c.valor),0))+'/mês';
+  const div=document.getElementById('listaClientes');
+  if(!list.length){div.innerHTML='<div style="text-align:center;padding:2rem;color:var(--txt3)">Nenhum cliente encontrado.</div>';return;}
+  div.innerHTML=list.map(c=>{
+    const pds=c.pendencias&&c.pendencias.length;
+    const sb={'ativo':'b-ativo','prospecto':'b-prosp','inativo':'b-inativo'}[c.status]||'b-ativo';
+    return`<div class="item${selId===c.id?' sel':''}" onclick="verCliente(${c.id})">
+      <div class="item-top">
+        <div><div class="item-name">${c.nome}</div><div class="item-sub">${c.seg||'—'} · ${c.cnpjs>1?c.cnpjs+' CNPJs':'1 CNPJ'}</div></div>
+        <div style="text-align:right;flex-shrink:0"><div class="item-val">${fmt(c.valor)}</div><div class="item-venc">${c.venc?'Venc. dia '+c.venc:''}</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-resp">${c.resp}</span>
+        ${(c.tipos||[]).map(t=>`<span class="tag tag-tipo">${t}</span>`).join('')}
+        ${c.sistema?`<span class="tag tag-sis">${c.sistema}</span>`:''}
+        <span class="badge ${sb}">${c.status}</span>
+        ${c.contrato?`<span class="badge b-ok">📄 Contrato</span>`:`<span class="badge b-warn">⚠️ Sem contrato</span>`}
+        <span style="font-size:11px">${c.class||''}</span>
+      </div>
+      ${pds?`<div style="font-size:11px;color:#e65100;margin-top:6px;font-weight:600">● ${pds} pendência(s)</div>`:''}
+    </div>`;
+  }).join('');
+}
+function verCliente(id){
+  selId=selId===id?null:id;
+  renderClientes();
+  const det=document.getElementById('clienteDetalhe');
+  if(!selId){det.innerHTML='';return;}
+  const c=clientes.find(x=>x.id===id);
+  const pds=(c.pendencias||[]).map((p,i)=>`<div class="task-item"><div class="task-dot" style="background:#ff9800"></div><span style="flex:1">${p}</span><button onclick="remPend(${id},${i})" style="background:none;border:none;color:#e53935;cursor:pointer;font-size:16px;line-height:1">×</button></div>`).join('');
+  det.innerHTML=`<div class="detail-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:17px;font-weight:800;color:var(--v)">${c.nome} <span style="font-size:12px;font-weight:400">${c.class||''}</span></div>
+      <button onclick="verCliente(${id})" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--txt3)">×</button>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-item"><div class="mini-lbl">Responsável</div><div class="mv">${c.resp}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Mensalidade</div><div class="mv">${fmt(c.valor)}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Sistema</div><div class="mv">${c.sistema||'—'}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Segmento</div><div class="mv">${c.seg||'—'}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Nº CNPJs</div><div class="mv">${c.cnpjs||1}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Início</div><div class="mv">${c.inicio?new Date(c.inicio+'T12:00').toLocaleDateString('pt-BR'):'—'}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Vencimento</div><div class="mv">${c.venc?'Dia '+c.venc:'—'}</div></div>
+      <div class="meta-item"><div class="mini-lbl">Status</div><div class="mv">${c.status}</div></div>
+    </div>
+    <div class="tags" style="margin-bottom:10px">${(c.tipos||[]).map(t=>`<span class="tag tag-tipo">${t}</span>`).join('')}</div>
+    ${c.obs?`<div style="font-size:12px;background:var(--bg);padding:9px 12px;border-radius:9px;margin-bottom:12px;color:var(--txt2)">${c.obs}</div>`:''}
+    <div class="sep"></div>
+    <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:8px">📄 Contrato</div>
+    ${c.contrato?`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#e8f5e9;border-radius:9px;font-size:12px;margin-bottom:8px"><i class="ti ti-file-check" style="color:#2e7d32"></i> ${c.contrato} ${c.link?`<a href="${c.link}" target="_blank" style="color:var(--v);margin-left:auto;font-size:11px;font-weight:700">Ver no Drive ↗</a>`:''}</div>`:`<div class="notif notif-warn" style="margin-bottom:8px">⚠️ Contrato ainda não cadastrado.</div>`}
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+      <input id="ct_${id}" placeholder="Nome do arquivo..." style="flex:1;min-width:120px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-family:inherit">
+      <input id="lk_${id}" placeholder="Link Drive..." style="flex:1;min-width:120px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-family:inherit">
+      <button onclick="atualizarContrato(${id})" class="btn btn-v" style="font-size:12px;padding:7px 12px">Salvar</button>
+    </div>
+    <div class="sep"></div>
+    <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:8px">📋 Pendências</div>
+    ${pds||'<div style="font-size:12px;color:var(--txt3);margin-bottom:8px">Sem pendências.</div>'}
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <input id="np_${id}" placeholder="Nova pendência..." style="flex:1;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:12px;font-family:inherit" onkeydown="if(event.key==='Enter')addPend(${id})">
+      <button onclick="addPend(${id})" class="btn btn-l" style="font-size:12px;padding:7px 12px">+ Adicionar</button>
+    </div>
+    <div class="sep"></div>
+    <div class="btn-row">
+      <button onclick="editarCliente(${id})" class="btn btn-ghost" style="font-size:12px"><i class="ti ti-edit"></i> Editar</button>
+      <button onclick="if(confirm('Remover?')){clientes=clientes.filter(x=>x.id!==${id});sv();selId=null;document.getElementById('clienteDetalhe').innerHTML='';renderClientes()}" class="btn btn-danger" style="font-size:12px">Remover</button>
+    </div>
+  </div>`;
+}
+function atualizarContrato(id){
+  const c=clientes.find(x=>x.id===id);
+  const v1=document.getElementById('ct_'+id).value.trim();
+  const v2=document.getElementById('lk_'+id).value.trim();
+  if(v1)c.contrato=v1;if(v2)c.link=v2;
+  sv();verCliente(id);verCliente(id);
+}
+function addPend(id){
+  const c=clientes.find(x=>x.id===id);
+  const txt=(document.getElementById('np_'+id)||{value:''}).value.trim();
+  if(!txt)return;
+  if(!c.pendencias)c.pendencias=[];
+  c.pendencias.push(txt);sv();verCliente(id);verCliente(id);
+}
+function remPend(id,idx){
+  const c=clientes.find(x=>x.id===id);
+  c.pendencias.splice(idx,1);sv();verCliente(id);verCliente(id);
+}
+function editarCliente(id){
+  const c=clientes.find(x=>x.id===id);
+  tiposSel=[...(c.tipos||[])];
+  clientes=clientes.filter(x=>x.id!==id);sv();
+  document.querySelectorAll('.nav-btn')[1].click();
+  setTimeout(()=>{
+    ['nome','cnpj','seg','obs','contrato','link'].forEach(f=>{const el=document.getElementById('n_'+f);if(el)el.value=c[f]||'';});
+    document.getElementById('n_resp').value=c.resp||'';
+    document.getElementById('n_status').value=c.status||'ativo';
+    document.getElementById('n_valor').value=c.valor||'';
+    document.getElementById('n_sistema').value=c.sistema||'';
+    document.getElementById('n_cnpjs').value=c.cnpjs||1;
+    document.getElementById('n_inicio').value=c.inicio||'';
+    document.getElementById('n_venc').value=c.venc||'';
+    document.getElementById('n_class').value=c.class||'';
+    renderTiposBtns();
+  },100);
+}
+function salvarCliente(){
+  const nome=document.getElementById('n_nome').value.trim();
+  if(!nome){document.getElementById('notifNovo').innerHTML='<div class="notif notif-warn">Informe o nome do cliente.</div>';return;}
+  if(!tiposSel.length){document.getElementById('notifNovo').innerHTML='<div class="notif notif-warn">Selecione ao menos um tipo de serviço.</div>';return;}
+  clientes.push({id:Date.now(),nome,cnpj:document.getElementById('n_cnpj').value,resp:document.getElementById('n_resp').value,valor:Number(document.getElementById('n_valor').value)||0,tipos:[...tiposSel],sistema:document.getElementById('n_sistema').value,status:document.getElementById('n_status').value,class:document.getElementById('n_class').value,seg:document.getElementById('n_seg').value,inicio:document.getElementById('n_inicio').value,venc:document.getElementById('n_venc').value,cnpjs:Number(document.getElementById('n_cnpjs').value)||1,obs:document.getElementById('n_obs').value,contrato:document.getElementById('n_contrato').value,link:document.getElementById('n_link').value,pendencias:[]});
+  sv();tiposSel=[];
+  document.getElementById('notifNovo').innerHTML='<div class="notif notif-ok">✅ Cliente salvo com sucesso!</div>';
+  setTimeout(()=>document.querySelectorAll('.nav-btn')[0].click(),1200);
+}
+function limparForm(){['n_nome','n_cnpj','n_valor','n_seg','n_inicio','n_venc','n_obs','n_contrato','n_link'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('n_cnpjs').value=1;tiposSel=[];renderTiposBtns();document.getElementById('notifNovo').innerHTML='';}
+function calcular(){
+  const g=id=>Number(document.getElementById(id).value)||0;
+  const p=g('c_pagar'),r=g('c_receber'),b=g('c_bancos'),a=g('c_aplic'),ct=g('c_cartoes'),n=g('c_notas'),bo=g('c_boletos'),rel=g('c_relat'),reu=g('c_reun');
+  const cc=document.getElementById('c_cc').value==='sim',dep=document.getElementById('c_dep').value==='sim';
+  const hora=Number(document.getElementById('c_hora').value)||121.21;
+  const margem=Number(document.getElementById('c_margem').value)||1.8;
+  const min=Number(document.getElementById('c_min').value)||3;
+  const mH=min/60;
+  let t=(p+r)*mH+(n+bo)*mH+b*0.75+a*0.5+ct*0.6+rel;
+  t*=(1+(cc?.3:0)+(dep?.2:0));
+  const base=t*hora*margem+reu*150;
+  const exc=(Math.max(0,b-2)+Math.max(0,a-1)+Math.max(0,ct-2))*150;
+  ultimoCalc=Math.round((base+exc)/10)*10;
+  const docs=p+r;
+  const plano=docs>150?'⭐⭐⭐ Avançado':docs>75?'⭐⭐ Intermediário':'⭐ Básico';
+  document.getElementById('resultadoCalc').innerHTML=`<div class="result-box"><div style="font-size:12px;opacity:.7;margin-bottom:2px">Honorário sugerido</div><div class="result-val">${fmt(ultimoCalc)}</div><div class="result-sub">${plano} · ${Math.round(t*10)/10}h/mês · ${docs} docs/mês</div></div><div class="kpi-row" style="margin-top:10px"><div class="kpi"><div class="kpi-v">${Math.round(t*10)/10}h</div><div class="kpi-l">Horas/mês</div></div><div class="kpi"><div class="kpi-v">${fmt(Math.round(t*hora*margem))}</div><div class="kpi-l">Valor base</div></div><div class="kpi"><div class="kpi-v">${fmt(reu*150)}</div><div class="kpi-l">Consultoria</div></div><div class="kpi"><div class="kpi-v">${fmt(exc)}</div><div class="kpi-l">Adicionais</div></div></div>`;
+}
+function usarCalcNoNovo(){if(!ultimoCalc)return;document.querySelectorAll('.nav-btn')[1].click();setTimeout(()=>{document.getElementById('n_valor').value=ultimoCalc;},100);}
+function renderAlfer(){
+  const fat=t=>clientes.filter(c=>c.status==='ativo'&&(c.tipos||[]).includes(t)).reduce((s,c)=>s+Number(c.valor),0);
+  const tot=clientes.filter(c=>c.status==='ativo').reduce((s,c)=>s+Number(c.valor),0);
+  document.getElementById('kpiAlfer').innerHTML=tipos.map(t=>`<div class="kpi"><div class="kpi-v">${fmt(fat(t))}</div><div class="kpi-l">${t}</div></div>`).join('')+`<div class="kpi" style="border-color:var(--l)"><div class="kpi-v">${fmt(tot)}</div><div class="kpi-l">Total Geral</div></div>`;
+}
+function salvarAlfer(){document.getElementById('notifAlfer').innerHTML='<div class="notif notif-ok">✅ Dados salvos.</div>';setTimeout(()=>document.getElementById('notifAlfer').innerHTML='',2000);}
+function renderEquipe(){
+  const div=document.getElementById('listaEquipe');
+  if(!equipe.length){div.innerHTML='<p style="color:var(--txt3)">Nenhum membro cadastrado.</p>';return;}
+  div.innerHTML=equipe.map((e,i)=>{
+    const ini=e.nome.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const idade=e.nasc?Math.floor((Date.now()-new Date(e.nasc+'T12:00'))/(365.25*24*3600*1000)):'';
+    const ctMap={'CLT':'#e8f5e9;color:#2e7d32','PJ':'#e3f2fd;color:#1565c0','Estágio':'#fff3e0;color:#e65100','Sócia':'#f3e5f5;color:#6a1b9a','':'#f5f5f5;color:#888'};
+    return`<div class="emp-card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div class="emp-avatar">${ini}</div><div style="flex:1"><div style="font-weight:700;font-size:13px;color:var(--v)">${e.nome}</div><div style="font-size:11px;color:var(--txt3)">${e.cargo}</div></div><button onclick="remFunc(${i})" style="background:none;border:none;color:#ddd;cursor:pointer;font-size:18px;line-height:1">×</button></div><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px">${e.contrato?`<span class="badge" style="background:${ctMap[e.contrato]||ctMap['']}">${e.contrato}</span>`:''}${e.sal?`<span class="badge" style="background:#e8f0d0;color:var(--v)">${fmt(e.sal)}</span>`:''}${idade?`<span style="font-size:10px;color:var(--txt3)">${idade} anos</span>`:''}</div>${e.nasc?`<div style="font-size:11px;color:var(--txt3)">🎂 ${new Date(e.nasc+'T12:00').toLocaleDateString('pt-BR')}</div>`:''}${e.admissao?`<div style="font-size:11px;color:var(--txt3)">📅 ${new Date(e.admissao+'T12:00').toLocaleDateString('pt-BR')}</div>`:''}${e.clientes?`<div style="font-size:10px;color:var(--txt3);margin-top:5px;font-style:italic">${e.clientes}</div>`:''}${e.obs?`<div style="font-size:10px;color:var(--txt3);margin-top:3px">${e.obs}</div>`:''}</div>`;
+  }).join('');
+}
+function salvarFuncionario(){
+  const nome=document.getElementById('e_nome').value.trim();
+  if(!nome){document.getElementById('notifEquipe').innerHTML='<div class="notif notif-warn">Informe o nome.</div>';return;}
+  equipe.push({nome,cargo:document.getElementById('e_cargo').value,contrato:document.getElementById('e_contrato').value,nasc:document.getElementById('e_nasc').value,admissao:document.getElementById('e_admissao').value,cpf:document.getElementById('e_cpf').value,email:document.getElementById('e_email').value,wpp:document.getElementById('e_wpp').value,sal:Number(document.getElementById('e_sal').value)||0,clientes:document.getElementById('e_clientes').value,obs:document.getElementById('e_obs').value});
+  sv();document.getElementById('notifEquipe').innerHTML='<div class="notif notif-ok">✅ '+nome+' adicionada!</div>';
+  ['e_nome','e_cpf','e_email','e_wpp','e_obs','e_clientes','e_nasc','e_admissao','e_sal'].forEach(id=>{document.getElementById(id).value='';});
+  renderEquipe();
+}
+function remFunc(i){if(!confirm('Remover?'))return;equipe.splice(i,1);sv();renderEquipe();}
+populateFilters();populateSelects();renderClientes();calcular();renderAlfer();renderEquipe();renderRespBtns();
+</script>
+</body>
+</html>
