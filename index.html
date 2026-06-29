@@ -1,1 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alfer — CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--v:#155126;--l:#afcb34;--c:#c8d384;--bg:#f2f5ee;--card:#fff;--bd:#dde5d4;--tx:#1a1a1a;--tx2:#4a5e3a;--tx3:#8a9a7a}
+body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:14px}
+/* TOP */
+.top{background:var(--v);color:#fff;padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:200;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.logo{width:33px;height:33px;border-radius:50%;background:var(--l);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--v);flex-shrink:0}
+.top-title{font-size:14px;font-weight:700;flex:1}
+.top-fat{font-size:12px;opacity:.8;font-weight:700}
+/* NAV */
+.nav{background:var(--v);display:flex;overflow-x:auto;padding:0 20px;border-top:1px solid rgba(255,255,255,.1)}
+.nb{padding:9px 14px;border:none;background:transparent;color:rgba(255,255,255,.65);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-family:inherit;transition:all .15s}
+.nb.on,.nb:hover{color:#fff;border-bottom-color:var(--l)}
+/* MAIN */
+.main{max-width:980px;margin:0 auto;padding:18px 14px}
+.pnl{display:none}.pnl.on{display:block}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--bd);border-radius:13px;padding:16px;margin-bottom:12px}
+.ct{font-size:12px;font-weight:700;color:var(--v);border-bottom:2px solid var(--c);padding-bottom:7px;margin-bottom:13px}
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+@media(max-width:580px){.g2,.g3{grid-template-columns:1fr}}
+/* FIELD */
+.f{display:flex;flex-direction:column;gap:3px}
+.f label{font-size:10px;color:var(--tx2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.f input,.f select,.f textarea{padding:8px 11px;border-radius:8px;border:1.5px solid var(--bd);font-size:13px;background:#fff;color:var(--tx);width:100%;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--l)}
+.f textarea{resize:vertical;min-height:60px}
+.f input[readonly]{background:#f5f7f2;color:var(--tx3)}
+/* BTN */
+.btn{padding:8px 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;border:none;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.bv{background:var(--v);color:#fff}.bv:hover{background:#1b6b32}
+.bl{background:var(--l);color:var(--v)}.bl:hover{background:var(--c)}
+.bg{background:transparent;color:var(--v);border:1.5px solid var(--v)}.bg:hover{background:var(--v);color:#fff}
+.bd2{background:#fce4ec;color:#880e4f;border:none}.bd2:hover{background:#f8bbd0}
+.br{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+/* KPI */
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(95px,1fr));gap:7px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:11px;text-align:center}
+.kv{font-size:16px;font-weight:800;color:var(--v)}.kl{font-size:10px;color:var(--tx3);margin-top:1px;font-weight:600;text-transform:uppercase}
+/* SEARCH */
+.srow{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
+.srow input,.srow select{padding:8px 11px;border-radius:8px;border:1.5px solid var(--bd);font-size:12px;background:#fff;color:var(--tx);font-family:inherit}
+.srow input{flex:1;min-width:130px}
+/* LIST */
+.lst{display:flex;flex-direction:column;gap:7px}
+.itm{background:var(--card);border:1.5px solid var(--bd);border-radius:11px;padding:12px 14px;cursor:pointer;transition:border .12s}
+.itm:hover,.itm.sel{border-color:var(--l)}
+.itm.sel{border-color:var(--v);border-width:2px}
+.iname{font-size:14px;font-weight:700;color:var(--v)}
+.isub{font-size:11px;color:var(--tx3);margin-top:1px}
+.ival{font-size:14px;font-weight:800;color:var(--v)}
+.ivenc{font-size:10px;color:var(--tx3)}
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.tag{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700}
+.tr{background:#e8f0d0;color:#155126}
+.tt{background:#dbeafe;color:#1d4ed8}
+.ts{background:#fef3c7;color:#92400e}
+.bdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.ok{background:#dcfce7;color:#166534}.pr{background:#dbeafe;color:#1e40af}.in{background:#fee2e2;color:#991b1b}
+.wn{background:#fef9c3;color:#854d0e}.gn{background:#dcfce7;color:#166534}
+/* NOTIF */
+.ntf{padding:9px 13px;border-radius:8px;font-size:12px;margin-bottom:10px;font-weight:600}
+.nok{background:#dcfce7;color:#166534;border-left:4px solid #22c55e}
+.nwn{background:#fef3c7;color:#854d0e;border-left:4px solid #eab308}
+.sep{height:1px;background:var(--bd);margin:13px 0}
+.ml{font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+/* DETAIL */
+.det{background:#fff;border:2px solid var(--v);border-radius:13px;padding:18px;margin-top:9px}
+.det-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.det-n{font-size:17px;font-weight:800;color:var(--v)}
+.xbtn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tx3);line-height:1}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px;margin-bottom:12px}
+.mv{font-size:13px;font-weight:700}
+/* TIPOS */
+.twrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tbtn{padding:6px 13px;border-radius:20px;border:2px solid var(--bd);background:#fff;color:var(--tx2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .12s}
+.tbtn.sel{border-color:var(--v);background:var(--v);color:#fff}
+.tbtn:hover:not(.sel){border-color:var(--l);color:var(--v)}
+.add-row{display:flex;gap:6px;margin-top:9px}
+.add-row input{flex:1;padding:7px 11px;border-radius:8px;border:1.5px solid var(--bd);font-size:12px;font-family:inherit}
+.add-row button{padding:7px 13px;border-radius:8px;background:var(--l);color:var(--v);border:none;font-weight:700;font-size:12px;cursor:pointer;font-family:inherit}
+/* RESULT */
+.res{background:var(--v);color:#fff;border-radius:11px;padding:16px;margin-top:13px;text-align:center}
+.rv{font-size:28px;font-weight:800;color:var(--l);margin:3px 0}
+/* EQUIPE */
+.ec{background:var(--card);border:1px solid var(--bd);border-radius:11px;padding:13px}
+.eavt{width:38px;height:38px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:var(--v);flex-shrink:0}
+/* DEMANDAS */
+.dem{background:var(--card);border:1.5px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:8px}
+.dem-h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.dem-t{font-size:13px;font-weight:700;color:var(--tx)}
+.dem-sub{font-size:11px;color:var(--tx3);margin-top:2px}
+.dem.urgente{border-left:4px solid #ef4444}
+.dem.hoje{border-left:4px solid #f59e0b}
+.dem.normal{border-left:4px solid var(--l)}
+.dem.concluido{opacity:.55;border-left:4px solid #94a3b8}
+.status-sel{padding:4px 8px;border-radius:6px;border:1.5px solid var(--bd);font-size:11px;font-family:inherit;background:#fff;cursor:pointer}
+.section-lbl{display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;background:var(--c);color:var(--v);margin-bottom:9px;text-transform:uppercase;letter-spacing:.3px}
+.edit-field{padding:6px 9px;border-radius:7px;border:1.5px solid var(--l);font-size:13px;font-family:inherit;background:#fffef5;width:100%;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo">A</div>
+  <div class="top-title">Alfer — CRM Gestão de Clientes</div>
+  <div class="top-fat" id="topFat"></div>
+</div>
+<div class="nav">
+  <button class="nb on" onclick="tab('clientes',this)">📋 Clientes</button>
+  <button class="nb" onclick="tab('novo',this)">➕ Novo Cliente</button>
+  <button class="nb" onclick="tab('demandas',this)">📌 Demandas</button>
+  <button class="nb" onclick="tab('calc',this)">🧮 Precificação</button>
+  <button class="nb" onclick="tab('alfer',this)">🏢 Alfer Interna</button>
+  <button class="nb" onclick="tab('equipe',this)">👥 Equipe</button>
+</div>
+<div class="main">
+
+<!-- CLIENTES -->
+<div id="p-clientes" class="pnl on">
+  <div class="krow" id="kpiC"></div>
+  <div class="srow">
+    <input type="text" id="busca" placeholder="Buscar cliente..." oninput="renderC()">
+    <select id="fResp" onchange="renderC()"><option value="">Todos responsáveis</option></select>
+    <select id="fTipo" onchange="renderC()"><option value="">Todos os serviços</option></select>
+    <select id="fStatus" onchange="renderC()">
+      <option value="">Todos status</option><option value="ativo">Ativo</option>
+      <option value="prospecto">Prospecto</option><option value="inativo">Inativo</option>
+    </select>
+    <select id="fClass" onchange="renderC()"><option value="">Todas classificações</option></select>
+  </div>
+  <div class="lst" id="lstC"></div>
+  <div id="detC"></div>
+</div>
+
+<!-- NOVO CLIENTE -->
+<div id="p-novo" class="pnl">
+<div class="card">
+  <div class="ct">➕ Cadastrar Novo Cliente</div>
+  <div id="ntfNovo"></div>
+  <div class="g2">
+    <div class="f"><label>Nome / Razão Social *</label><input id="nn_nome" placeholder="Ex: Lambreta Bistrô"></div>
+    <div class="f"><label>CNPJ / CPF</label><input id="nn_cnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="f"><label>Responsável *</label><select id="nn_resp"></select></div>
+    <div class="f"><label>Status</label><select id="nn_status"><option value="ativo">Ativo</option><option value="prospecto">Prospecto</option><option value="inativo">Inativo</option></select></div>
+    <div class="f"><label>Mensalidade (R$)</label><input id="nn_valor" type="number" placeholder="0,00" min="0"></div>
+    <div class="f"><label>Segmento / Ramo</label><input id="nn_seg" placeholder="Ex: Alimentação, Saúde..."></div>
+    <div class="f"><label>Sistema Principal</label>
+      <select id="nn_sistema"><option value="">— Não informado —</option><option>Omie</option><option>ContaAzul</option><option>Nibo</option><option>SAP</option><option>Outro</option></select></div>
+    <div class="f"><label>Nº de CNPJs / Empresas</label><input id="nn_cnpjs" type="number" value="1" min="1"></div>
+    <div class="f"><label>Início do Contrato</label><input id="nn_inicio" type="date"></div>
+    <div class="f"><label>Dia de Vencimento</label><input id="nn_venc" type="number" placeholder="Ex: 5" min="1" max="31"></div>
+    <div class="f"><label>Classificação</label><select id="nn_class"></select></div>
+    <div class="f"><label>Arquivo do Contrato</label><input id="nn_contrato" placeholder="Contrato_Cliente.pdf"></div>
+  </div>
+  <div class="f" style="margin-top:8px"><label>Link do Contrato (Drive)</label><input id="nn_link" placeholder="https://drive.google.com/..."></div>
+  <div class="sep"></div>
+  <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:5px">Tipo de Serviço *</div>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:7px">Selecione um ou mais. Crie novos tipos com o botão abaixo.</p>
+  <div class="twrap" id="tiposBtnsNovo"></div>
+  <div class="add-row">
+    <input id="novoTipoInput" placeholder="Nome do novo tipo..." onkeydown="if(event.key==='Enter')addTipo()">
+    <button onclick="addTipo()">+ Novo tipo</button>
+  </div>
+  <div class="sep"></div>
+  <div class="f"><label>Observações / Escopo</label><textarea id="nn_obs" placeholder="Descreva o escopo, particularidades..."></textarea></div>
+  <div class="br">
+    <button class="btn bv" onclick="salvarCliente()">💾 Salvar Cliente</button>
+    <button class="btn bl" onclick="tab('calc',document.querySelectorAll('.nb')[3])">🧮 Calcular Honorários</button>
+    <button class="btn bg" onclick="limparNovo()">🔄 Limpar</button>
+  </div>
+</div>
+</div>
+
+<!-- DEMANDAS -->
+<div id="p-demandas" class="pnl">
+<div class="card">
+  <div class="ct">📌 Nova Demanda</div>
+  <div id="ntfDem"></div>
+  <div class="g2">
+    <div class="f"><label>Cliente *</label><select id="d_cli"></select></div>
+    <div class="f"><label>Tipo de Demanda</label>
+      <select id="d_tipo">
+        <option>Fechamento Mensal</option>
+        <option>Reunião de Alinhamento</option>
+        <option>Envio de Relatório</option>
+        <option>Conciliação Bancária</option>
+        <option>Folha de Pagamento</option>
+        <option>Declaração / Obrigação Fiscal</option>
+        <option>Proposta Comercial</option>
+        <option>Onboarding</option>
+        <option>Outro</option>
+      </select></div>
+    <div class="f"><label>Prazo</label><input id="d_prazo" type="date"></div>
+    <div class="f"><label>Prioridade</label>
+      <select id="d_prio"><option value="normal">Normal</option><option value="hoje">Urgente hoje</option><option value="urgente">Muito urgente</option></select></div>
+    <div class="f"><label>Responsável</label><select id="d_resp"></select></div>
+    <div class="f"><label>Status</label>
+      <select id="d_status"><option value="aberta">Em aberto</option><option value="andamento">Em andamento</option><option value="concluido">Concluída</option></select></div>
+  </div>
+  <div class="f" style="margin-top:8px"><label>Descrição / Anotação</label><textarea id="d_desc" placeholder="Detalhe a demanda, o que foi combinado na reunião, prazos específicos..."></textarea></div>
+  <div class="br"><button class="btn bv" onclick="salvarDem()">📌 Adicionar Demanda</button></div>
+</div>
+
+<div class="card">
+  <div class="ct">📋 Todas as Demandas</div>
+  <div class="srow">
+    <select id="dfCli" onchange="renderDem()"><option value="">Todos os clientes</option></select>
+    <select id="dfStatus" onchange="renderDem()">
+      <option value="">Todos status</option>
+      <option value="aberta">Em aberto</option>
+      <option value="andamento">Em andamento</option>
+      <option value="concluido">Concluída</option>
+    </select>
+    <select id="dfPrio" onchange="renderDem()">
+      <option value="">Todas prioridades</option>
+      <option value="urgente">Muito urgente</option>
+      <option value="hoje">Urgente hoje</option>
+      <option value="normal">Normal</option>
+    </select>
+    <select id="dfResp" onchange="renderDem()"><option value="">Todos responsáveis</option></select>
+  </div>
+  <div id="lstDem"></div>
+</div>
+</div>
+
+<!-- PRECIFICAÇÃO -->
+<div id="p-calc" class="pnl">
+<div class="card">
+  <div class="ct">📋 Mapeamento Comercial — Perguntas ao Cliente</div>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">Preencha antes da reunião ou durante a entrevista de diagnóstico. Esses dados alimentam o cálculo automático abaixo.</p>
+  <div class="g2">
+    <div class="f"><label>Nome do Prospect / Empresa</label><input id="m_nome" placeholder="Ex: Distribuidora XYZ Ltda"></div>
+    <div class="f"><label>Regime Tributário</label>
+      <select id="m_regime">
+        <option value="">— Selecione —</option>
+        <option>Simples Nacional</option>
+        <option>Lucro Presumido</option>
+        <option>Lucro Real</option>
+        <option>MEI</option>
+        <option>Não sabe</option>
+      </select></div>
+    <div class="f"><label>Quantos CNPJs?</label><input id="m_cnpjs" type="number" min="1" placeholder="Ex: 1" oninput="sincMapeamento()"></div>
+    <div class="f"><label>Faturamento Médio Mensal (R$)</label><input id="m_fat" type="number" placeholder="Ex: 150000"></div>
+    <div class="f"><label>Quantos clientes ativos?</label><input id="m_clientes" type="number" placeholder="Ex: 80"></div>
+    <div class="f"><label>Quantos funcionários?</label><input id="m_func" type="number" placeholder="Ex: 12"></div>
+  </div>
+  <div class="sep"></div>
+  <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:8px">📞 Dados da Contabilidade Atual</div>
+  <div class="g2">
+    <div class="f"><label>Nome do Contador / Escritório</label><input id="m_cont_nome" placeholder="Ex: Escritório Contábil Silva"></div>
+    <div class="f"><label>Telefone do Contador</label><input id="m_cont_tel" placeholder="(62) 9..."></div>
+    <div class="f"><label>E-mail do Contador</label><input id="m_cont_email" placeholder="contador@email.com"></div>
+    <div class="f"><label>Usa sistema contábil?</label>
+      <select id="m_sistema_cont">
+        <option value="">— Não informado —</option>
+        <option>Domínio</option><option>Alterdata</option><option>Prosoft</option>
+        <option>Questor</option><option>Totvs</option><option>Outro</option>
+      </select></div>
+  </div>
+  <div class="sep"></div>
+  <div style="font-size:12px;font-weight:700;color:var(--v);margin-bottom:8px">😣 Dores Atuais do Cliente</div>
+  <div class="f"><label>Principais problemas relatados</label><textarea id="m_dores" rows="2" placeholder="Ex: Não tem visão do fluxo, relatórios atrasados, sem conciliação bancária..."></textarea></div>
+  <div class="f" style="margin-top:8px"><label>Observações da Reunião</label><textarea id="m_obs" rows="2" placeholder="Anotações livres da conversa, próximos passos..."></textarea></div>
+  <div class="br">
+    <button class="btn bl" onclick="usarMapeamento()">↓ Usar dados no cálculo abaixo</button>
+    <button class="btn bg" onclick="limparMapeamento()">🔄 Limpar</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="ct">🧮 Calculadora de Honorários BPO</div>
+  <div class="section-lbl">Volumetria do Cliente</div>
+  <div class="g3">
+    <div class="f"><label>Contas a Pagar/mês</label><input type="number" id="c_p" value="50" oninput="calc()"></div>
+    <div class="f"><label>Contas a Receber/mês</label><input type="number" id="c_r" value="50" oninput="calc()"></div>
+    <div class="f"><label>Contas bancárias</label><input type="number" id="c_b" value="2" oninput="calc()"></div>
+    <div class="f"><label>Contas de aplicação</label><input type="number" id="c_a" value="1" oninput="calc()"></div>
+    <div class="f"><label>Adquirentes cartão</label><input type="number" id="c_ct" value="1" oninput="calc()"></div>
+    <div class="f"><label>Notas fiscais/mês</label><input type="number" id="c_n" value="10" oninput="calc()"></div>
+    <div class="f"><label>Boletos/mês</label><input type="number" id="c_bo" value="10" oninput="calc()"></div>
+    <div class="f"><label>Horas relatórios</label><input type="number" id="c_re" value="1" oninput="calc()"></div>
+    <div class="f"><label>Horas reunião consultiva</label><input type="number" id="c_ru" value="1" oninput="calc()"></div>
+  </div>
+  <div class="g2" style="margin-top:7px">
+    <div class="f"><label>Centro de custo?</label><select id="c_cc" onchange="calc()"><option value="0">Não</option><option value="0.3">Sim (+30%)</option></select></div>
+    <div class="f"><label>Departamento/projetos?</label><select id="c_dep" onchange="calc()"><option value="0">Não</option><option value="0.2">Sim (+20%)</option></select></div>
+  </div>
+  <div class="sep"></div>
+  <div class="section-lbl">Parâmetros da Operação</div>
+  <div class="g3">
+    <div class="f"><label>Preço/hora (R$)</label><input type="number" id="c_h" value="121.21" oninput="calc()"></div>
+    <div class="f"><label>Margem de lucro</label>
+      <select id="c_m" onchange="calc()"><option value="1.5">1,5x Básico</option><option value="1.8" selected>1,8x Intermediário</option><option value="2.2">2,2x Avançado</option></select></div>
+    <div class="f"><label>Min/lançamento</label><input type="number" id="c_min" value="3" oninput="calc()"></div>
+  </div>
+  <div id="resCalc"></div>
+  <div class="br">
+    <button class="btn bv" onclick="usarCalc()">↗ Usar em Novo Cliente</button>
+    <button class="btn bl" onclick="gerarResumo()">📄 Resumo do Mapeamento</button>
+  </div>
+  <div id="resumoMap" style="display:none;margin-top:14px;background:#f9fdf4;border:2px solid var(--l);border-radius:10px;padding:14px;font-size:12px;line-height:1.9"></div>
+</div>
+</div>
+
+<!-- ALFER INTERNA -->
+<div id="p-alfer" class="pnl">
+<div class="card">
+  <div class="ct">🏢 Alfer — Dados da Empresa</div>
+  <div id="ntfAlfer"></div>
+  <div class="g2">
+    <div class="f"><label>Razão Social</label><input value="Alfer Gestão Financeira Estratégica" readonly></div>
+    <div class="f"><label>CNPJ</label><input value="49.015.525/0001-90" readonly></div>
+    <div class="f"><label>Sócia</label><input id="a_s" value="Fernanda Alvarenga Cavalcante"></div>
+    <div class="f"><label>Cidade</label><input id="a_c" value="Goiânia / GO"></div>
+    <div class="f"><label>WhatsApp</label><input id="a_w" placeholder="(62) 9..."></div>
+    <div class="f"><label>E-mail</label><input id="a_e" placeholder="contato@alfer.com.br"></div>
+    <div class="f"><label>Meta Mensal (R$)</label><input id="a_m" type="number" placeholder="50000"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="ct" style="margin-bottom:10px">📊 Faturamento por Serviço</div>
+  <div class="krow" id="kpiAlfer"></div>
+  <div class="sep"></div>
+  <div class="f"><label>Pendências Internas</label><textarea id="a_p" rows="3" placeholder="Contratos a renovar, obrigações, tarefas administrativas..."></textarea></div>
+  <div class="br"><button class="btn bv" onclick="svAlfer()">💾 Salvar</button></div>
+</div>
+<div class="card">
+  <div class="ct">👤 Gerenciar Responsáveis</div>
+  <div class="twrap" id="respBtns"></div>
+  <div class="add-row" style="margin-top:9px">
+    <input id="novoRespInput" placeholder="Nome do analista..." onkeydown="if(event.key==='Enter')addResp()">
+    <button onclick="addResp()">+ Adicionar</button>
+  </div>
+</div>
+</div>
+
+<!-- EQUIPE -->
+<div id="p-equipe" class="pnl">
+<div class="card">
+  <div class="ct">👤 Adicionar Membro</div>
+  <div id="ntfEq"></div>
+  <div class="g2">
+    <div class="f"><label>Nome Completo *</label><input id="e_n" placeholder="Nome da colaboradora"></div>
+    <div class="f"><label>Cargo</label><select id="e_c"><option>Analista Financeiro</option><option>Assistente Financeiro</option><option>Auxiliar Financeiro</option><option>Analista DP</option><option>Coordenadora</option><option>Sócia</option></select></div>
+    <div class="f"><label>Vínculo</label><select id="e_v"><option>CLT</option><option>PJ</option><option>Estágio</option><option>Sócia</option></select></div>
+    <div class="f"><label>Data de Nascimento</label><input id="e_nasc" type="date"></div>
+    <div class="f"><label>Data de Admissão</label><input id="e_adm" type="date"></div>
+    <div class="f"><label>CPF</label><input id="e_cpf" placeholder="000.000.000-00"></div>
+    <div class="f"><label>E-mail</label><input id="e_em" placeholder="nome@alfer.com.br"></div>
+    <div class="f"><label>WhatsApp</label><input id="e_wp" placeholder="(62) 9..."></div>
+    <div class="f"><label>Salário / Honorário (R$)</label><input id="e_sal" type="number"></div>
+    <div class="f"><label>Clientes sob Responsabilidade</label><input id="e_cli" placeholder="Lambreta, JH..."></div>
+  </div>
+  <div class="f" style="margin-top:8px"><label>Observações / Benefícios</label><textarea id="e_obs" placeholder="VT, VR, plano de saúde, férias..."></textarea></div>
+  <div class="br"><button class="btn bv" onclick="svFunc()">➕ Adicionar</button></div>
+</div>
+<div class="card">
+  <div class="ct">👥 Equipe Alfer</div>
+  <div id="lstEq"></div>
+</div>
+</div>
+
+</div><!-- /main -->
+<script>
+// ── DADOS ───────────────────────────────────────────────────────
+function ld(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
+function sv(){['clientes','equipe','tipos','classes','resps','demandas'].forEach(k=>localStorage.setItem('alfer_'+k,JSON.stringify(eval(k))))}
+function fmt(v){return'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}
+function fmtData(d){return d?new Date(d+'T12:00').toLocaleDateString('pt-BR'):'—'}
+
+const DEF_TIPOS=['BPO Financeiro','Departamento Pessoal','Mentoria','Cobrança'];
+const DEF_CLASS=['⭐ Básico','⭐⭐ Intermediário','⭐⭐⭐ Avançado','💎 Premium'];
+const DEF_RESP=['Aline','Vanessa','Nathalia','Karol','Fernanda'];
+const DEF_CLI=[
+  {id:1,nome:'Lambreta',cnpj:'',resp:'Aline',valor:1500,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'Alimentação',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:2,nome:'Alvorada',cnpj:'',resp:'Aline',valor:1621,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:3,nome:'Amoreco',cnpj:'',resp:'Aline',valor:1500,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:4,nome:'JH Elevadores',cnpj:'',resp:'Aline',valor:2000,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'Serviços',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'Contrato_JH.docx',link:''},
+  {id:5,nome:'Ranchos 30',cnpj:'',resp:'Vanessa',valor:2700,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐⭐⭐ Avançado',seg:'Hotelaria',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:6,nome:'Veed',cnpj:'',resp:'Vanessa',valor:1000,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:7,nome:'PD1',cnpj:'',resp:'Vanessa',valor:2000,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:8,nome:'Pumb',cnpj:'',resp:'Vanessa',valor:865,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:9,nome:'Favorita',cnpj:'',resp:'Vanessa',valor:1720,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:10,nome:'Bardan',cnpj:'',resp:'Nathalia',valor:2090,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:11,nome:'Bronzear',cnpj:'',resp:'Nathalia',valor:1621,tipos:['BPO Financeiro','Cobrança'],sistema:'Nibo',status:'ativo',class:'⭐⭐ Intermediário',seg:'Estética',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:12,nome:'Jaspe',cnpj:'',resp:'Nathalia',valor:2000,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:13,nome:'Ingrid Gomes',cnpj:'',resp:'Nathalia',valor:400,tipos:['BPO Financeiro'],sistema:'Nibo',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'Importação C6 Bank',contrato:'',link:''},
+  {id:14,nome:'Grupo Inove',cnpj:'',resp:'Karol',valor:2750,tipos:['BPO Financeiro'],sistema:'ContaAzul',status:'ativo',class:'💎 Premium',seg:'Indústria',inicio:'',venc:5,cnpjs:3,obs:'LS, INOVE, DL',contrato:'',link:''},
+  {id:15,nome:'PAWA Marine',cnpj:'',resp:'Karol',valor:1621,tipos:['BPO Financeiro'],sistema:'Omie',status:'ativo',class:'⭐⭐ Intermediário',seg:'Náutica',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:16,nome:'Teclub',cnpj:'',resp:'Fernanda',valor:2350,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:17,nome:'Emporio Body',cnpj:'',resp:'Fernanda',valor:1621,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:18,nome:'Bronzear DP',cnpj:'',resp:'Fernanda',valor:810,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'Estética',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:19,nome:'Bardan DP',cnpj:'',resp:'Fernanda',valor:810,tipos:['Departamento Pessoal'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:20,nome:'Stint',cnpj:'',resp:'Fernanda',valor:2000,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐⭐ Intermediário',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:21,nome:'Pumb Cobr',cnpj:'',resp:'Fernanda',valor:320,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:22,nome:'Amoreco Cobr',cnpj:'',resp:'Fernanda',valor:1000,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:23,nome:'Lambreta Cobr',cnpj:'',resp:'Fernanda',valor:1500,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'Alimentação',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+  {id:24,nome:'PD1 Cobr',cnpj:'',resp:'Fernanda',valor:800,tipos:['Cobrança'],sistema:'',status:'ativo',class:'⭐ Básico',seg:'',inicio:'',venc:5,cnpjs:1,obs:'',contrato:'',link:''},
+];
+const DEF_EQ=[
+  {nome:'Fernanda Alvarenga',cargo:'Sócia',vinculo:'Sócia',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:0,cli:'Gestão geral',obs:'CNPJ 49.015.525/0001-90'},
+  {nome:'Aline',cargo:'Analista Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:2000,cli:'Lambreta, Alvorada, Amoreco, JH',obs:''},
+  {nome:'Vanessa',cargo:'Analista Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:2000,cli:'Ranchos, Veed, PD1, Pumb, Favorita',obs:''},
+  {nome:'Nathalia',cargo:'Analista Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:2000,cli:'Bardan, Bronzear, Jaspe, Ingrid',obs:''},
+  {nome:'Anna Karollynny',cargo:'Analista Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:2000,cli:'Grupo Inove, PAWA Marine',obs:''},
+  {nome:'Aryelli',cargo:'Assistente Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:0,cli:'',obs:''},
+  {nome:'Raissa',cargo:'Assistente Financeiro',vinculo:'',nasc:'',adm:'',cpf:'',email:'',wpp:'',sal:0,cli:'',obs:''},
+];
+
+let clientes=ld('alfer_clientes')||DEF_CLI;
+let equipe=ld('alfer_equipe')||DEF_EQ;
+let tipos=ld('alfer_tipos')||[...DEF_TIPOS];
+let classes=ld('alfer_classes')||[...DEF_CLASS];
+let resps=ld('alfer_resps')||[...DEF_RESP];
+let demandas=ld('alfer_demandas')||[];
+let tiposSel=[];
+let selId=null;
+let ultimoCalc=0;
+
+// ── NAV ──────────────────────────────────────────────────────────
+function tab(t,btn){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+t).classList.add('on');
+  if(btn)btn.classList.add('on');
+  if(t==='clientes'){pFiltros();renderC();}
+  if(t==='novo'){renderTiposNovo();pSelects();}
+  if(t==='calc')calc();
+  if(t==='alfer'){renderAlfer();renderRespBtns();}
+  if(t==='equipe')renderEq();
+  if(t==='demandas'){pDemFiltros();renderDem();}
+}
+
+// ── SELECTS / FILTROS ────────────────────────────────────────────
+function pFiltros(){
+  const fr=document.getElementById('fResp'),ft=document.getElementById('fTipo'),fc=document.getElementById('fClass');
+  const vr=fr.value,vt=ft.value,vc=fc.value;
+  fr.innerHTML='<option value="">Todos responsáveis</option>'+resps.map(r=>`<option${vr===r?' selected':''}>${r}</option>`).join('');
+  ft.innerHTML='<option value="">Todos os serviços</option>'+tipos.map(t=>`<option${vt===t?' selected':''}>${t}</option>`).join('');
+  fc.innerHTML='<option value="">Todas classificações</option>'+classes.map(c=>`<option${vc===c?' selected':''}>${c}</option>`).join('');
+}
+function pSelects(){
+  const nr=document.getElementById('nn_resp'),nc=document.getElementById('nn_class');
+  if(nr)nr.innerHTML=resps.map(r=>`<option>${r}</option>`).join('');
+  if(nc)nc.innerHTML=classes.map(c=>`<option>${c}</option>`).join('');
+}
+function pDemFiltros(){
+  const dc=document.getElementById('dfCli'),dr=document.getElementById('dfResp');
+  const vdc=dc.value,vdr=dr.value;
+  dc.innerHTML='<option value="">Todos os clientes</option>'+clientes.map(c=>`<option value="${c.id}"${vdc==c.id?' selected':''}>${c.nome}</option>`).join('');
+  dr.innerHTML='<option value="">Todos responsáveis</option>'+resps.map(r=>`<option${vdr===r?' selected':''}>${r}</option>`).join('');
+  // form
+  const ddc=document.getElementById('d_cli'),ddr=document.getElementById('d_resp');
+  if(ddc)ddc.innerHTML=clientes.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  if(ddr)ddr.innerHTML=resps.map(r=>`<option>${r}</option>`).join('');
+}
+
+// ── TIPOS ─────────────────────────────────────────────────────────
+function renderTiposNovo(){
+  const w=document.getElementById('tiposBtnsNovo');if(!w)return;
+  w.innerHTML=tipos.map(t=>`<button class="tbtn${tiposSel.includes(t)?' sel':''}" onclick="togTipo('${t.replace(/'/g,"\\'")}',this)">${t}</button>`).join('');
+}
+function togTipo(t){tiposSel=tiposSel.includes(t)?tiposSel.filter(x=>x!==t):[...tiposSel,t];renderTiposNovo();}
+function addTipo(){
+  const v=document.getElementById('novoTipoInput').value.trim();
+  if(!v||tipos.includes(v))return;
+  tipos.push(v);sv();document.getElementById('novoTipoInput').value='';
+  renderTiposNovo();pFiltros();
+}
+
+// ── RESPONSÁVEIS ──────────────────────────────────────────────────
+function renderRespBtns(){
+  const w=document.getElementById('respBtns');if(!w)return;
+  w.innerHTML=resps.map((r,i)=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:#e8f0d0;color:var(--v);font-size:12px;font-weight:700">${r}<button onclick="delResp(${i})" style="background:none;border:none;color:#aaa;cursor:pointer;font-size:14px;line-height:1;margin-left:2px">×</button></span>`).join('');
+}
+function addResp(){
+  const v=document.getElementById('novoRespInput').value.trim();
+  if(!v||resps.includes(v))return;
+  resps.push(v);sv();document.getElementById('novoRespInput').value='';
+  renderRespBtns();pFiltros();pSelects();pDemFiltros();
+}
+function delResp(i){if(!confirm('Remover '+resps[i]+'?'))return;resps.splice(i,1);sv();renderRespBtns();pFiltros();pSelects();}
+
+// ── CLIENTES ──────────────────────────────────────────────────────
+function renderC(){
+  const q=(document.getElementById('busca')||{value:''}).value.toLowerCase();
+  const fr=(document.getElementById('fResp')||{value:''}).value;
+  const ft=(document.getElementById('fTipo')||{value:''}).value;
+  const fs=(document.getElementById('fStatus')||{value:''}).value;
+  const fc=(document.getElementById('fClass')||{value:''}).value;
+  const lst=clientes.filter(c=>(c.nome.toLowerCase().includes(q)||(c.seg||'').toLowerCase().includes(q))&&(!fr||c.resp===fr)&&(!ft||(c.tipos||[]).includes(ft))&&(!fs||c.status===fs)&&(!fc||c.class===fc));
+  const tot=lst.reduce((s,c)=>s+Number(c.valor),0);
+  const dems=lst.filter(c=>demandas.some(d=>d.cliId==c.id&&d.status!=='concluido')).length;
+  const semCt=lst.filter(c=>!c.contrato&&c.status==='ativo').length;
+  document.getElementById('kpiC').innerHTML=`
+    <div class="kpi"><div class="kv">${lst.length}</div><div class="kl">Clientes</div></div>
+    <div class="kpi"><div class="kv">${lst.filter(c=>c.status==='ativo').length}</div><div class="kl">Ativos</div></div>
+    <div class="kpi"><div class="kv">${fmt(tot)}</div><div class="kl">Faturamento</div></div>
+    <div class="kpi"><div class="kv" style="color:${dems>0?'#e65100':'var(--v)'}">${dems}</div><div class="kl">Com demandas</div></div>
+    <div class="kpi"><div class="kv" style="color:${semCt>0?'#880e4f':'var(--v)'}">${semCt}</div><div class="kl">Sem contrato</div></div>`;
+  document.getElementById('topFat').textContent=fmt(clientes.filter(c=>c.status==='ativo').reduce((s,c)=>s+Number(c.valor),0))+'/mês';
+  const div=document.getElementById('lstC');
+  if(!lst.length){div.innerHTML='<div style="text-align:center;padding:2rem;color:var(--tx3)">Nenhum cliente encontrado.</div>';return;}
+  div.innerHTML=lst.map(c=>{
+    const nDem=demandas.filter(d=>d.cliId==c.id&&d.status!=='concluido').length;
+    const sb={'ativo':'ok','prospecto':'pr','inativo':'in'}[c.status]||'ok';
+    return`<div class="itm${selId===c.id?' sel':''}" onclick="verC(${c.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div><div class="iname">${c.nome}</div><div class="isub">${c.seg||'—'} · ${c.cnpjs>1?c.cnpjs+' CNPJs':'1 CNPJ'}</div></div>
+        <div style="text-align:right;flex-shrink:0"><div class="ival">${fmt(c.valor)}</div><div class="ivenc">${c.venc?'Venc. dia '+c.venc:''}</div></div>
+      </div>
+      <div class="tags">
+        <span class="tag tr">${c.resp}</span>
+        ${(c.tipos||[]).map(t=>`<span class="tag tt">${t}</span>`).join('')}
+        ${c.sistema?`<span class="tag ts">${c.sistema}</span>`:''}
+        <span class="bdg ${sb}">${c.status}</span>
+        ${c.contrato?`<span class="bdg gn">📄 Contrato</span>`:`<span class="bdg wn">⚠️ Sem contrato</span>`}
+        <span style="font-size:11px">${c.class||''}</span>
+        ${nDem?`<span class="bdg" style="background:#fef3c7;color:#92400e">📌 ${nDem} demanda(s)</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function verC(id){
+  selId=selId===id?null:id;
+  renderC();
+  const det=document.getElementById('detC');
+  if(!selId){det.innerHTML='';return;}
+  const c=clientes.find(x=>x.id===id);
+  const cDems=demandas.filter(d=>d.cliId==id&&d.status!=='concluido');
+  const statusMap={'aberta':'Em aberto','andamento':'Em andamento','concluido':'Concluída'};
+  const prioMap={'normal':'Normal','hoje':'Urgente hoje','urgente':'Muito urgente'};
+  det.innerHTML=`<div class="det">
+    <div class="det-h">
+      <div class="det-n">${c.nome}</div>
+      <button class="xbtn" onclick="verC(${id})">×</button>
+    </div>
+
+    <!-- EDIÇÃO INLINE -->
+    <div class="section-lbl">✏️ Editar Dados</div>
+    <div class="g2" style="margin-bottom:10px">
+      <div class="f"><label>Nome</label><input class="edit-field" id="e_nome_${id}" value="${c.nome}"></div>
+      <div class="f"><label>CNPJ / CPF</label><input class="edit-field" id="e_cnpj_${id}" value="${c.cnpj||''}"></div>
+      <div class="f"><label>Responsável</label><select class="edit-field" id="e_resp_${id}">${resps.map(r=>`<option${r===c.resp?' selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="f"><label>Status</label><select class="edit-field" id="e_status_${id}"><option value="ativo"${c.status==='ativo'?' selected':''}>Ativo</option><option value="prospecto"${c.status==='prospecto'?' selected':''}>Prospecto</option><option value="inativo"${c.status==='inativo'?' selected':''}>Inativo</option></select></div>
+      <div class="f"><label>Mensalidade (R$)</label><input class="edit-field" type="number" id="e_valor_${id}" value="${c.valor}"></div>
+      <div class="f"><label>Segmento</label><input class="edit-field" id="e_seg_${id}" value="${c.seg||''}"></div>
+      <div class="f"><label>Sistema</label><select class="edit-field" id="e_sis_${id}"><option value="">— Não informado —</option>${['Omie','ContaAzul','Nibo','SAP','Outro'].map(s=>`<option${s===c.sistema?' selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="f"><label>Nº CNPJs</label><input class="edit-field" type="number" id="e_cnpjs_${id}" value="${c.cnpjs||1}"></div>
+      <div class="f"><label>Início do Contrato</label><input class="edit-field" type="date" id="e_inicio_${id}" value="${c.inicio||''}"></div>
+      <div class="f"><label>Dia de Vencimento</label><input class="edit-field" type="number" id="e_venc_${id}" value="${c.venc||''}"></div>
+      <div class="f"><label>Classificação</label><select class="edit-field" id="e_class_${id}">${classes.map(cl=>`<option${cl===c.class?' selected':''}>${cl}</option>`).join('')}</select></div>
+    </div>
+    <div class="f" style="margin-bottom:8px"><label>Observações / Escopo</label><textarea class="edit-field" id="e_obs_${id}" rows="2">${c.obs||''}</textarea></div>
+    <div class="f" style="margin-bottom:4px"><label>Arquivo do Contrato</label><input class="edit-field" id="e_ct_${id}" value="${c.contrato||''}" placeholder="Contrato_Cliente.pdf"></div>
+    <div class="f" style="margin-bottom:10px"><label>Link Drive</label><input class="edit-field" id="e_lk_${id}" value="${c.link||''}" placeholder="https://drive.google.com/..."></div>
+    <div class="br" style="margin-top:0;margin-bottom:14px">
+      <button class="btn bv" onclick="salvarEdicao(${id})">💾 Salvar Alterações</button>
+      <button class="btn bd2" onclick="if(confirm('Remover ${c.nome.replace(/'/g,"\\'")}?')){clientes=clientes.filter(x=>x.id!==${id});sv();selId=null;document.getElementById('detC').innerHTML='';renderC()}">🗑 Remover Cliente</button>
+    </div>
+
+    <div class="sep"></div>
+    <div class="section-lbl">📌 Demandas Abertas (${cDems.length})</div>
+    ${cDems.length?cDems.map((d,i)=>{
+      const idx=demandas.indexOf(d);
+      return`<div class="dem ${d.prio||'normal'}">
+        <div class="dem-h">
+          <div><div class="dem-t">${d.tipo}</div><div class="dem-sub">${d.desc||''}</div><div style="font-size:10px;color:var(--tx3);margin-top:3px">${d.prazo?'Prazo: '+fmtData(d.prazo):''} ${d.resp?'· '+d.resp:''}</div></div>
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            <select class="status-sel" onchange="mudaStatusDem(${idx},this.value)">
+              <option value="aberta"${d.status==='aberta'?' selected':''}>Em aberto</option>
+              <option value="andamento"${d.status==='andamento'?' selected':''}>Em andamento</option>
+              <option value="concluido"${d.status==='concluido'?' selected':''}>Concluída</option>
+            </select>
+            <button onclick="delDem(${idx})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;line-height:1">×</button>
+          </div>
+        </div>
+      </div>`;}).join(''):'<div style="font-size:12px;color:var(--tx3);margin-bottom:8px">Nenhuma demanda aberta.</div>'}
+    <button class="btn bl" style="font-size:11px;margin-top:6px" onclick="irNovaDem(${id})">+ Nova demanda para este cliente</button>
+  </div>`;
+}
+
+function salvarEdicao(id){
+  const c=clientes.find(x=>x.id===id);
+  c.nome=document.getElementById('e_nome_'+id).value.trim()||c.nome;
+  c.cnpj=document.getElementById('e_cnpj_'+id).value;
+  c.resp=document.getElementById('e_resp_'+id).value;
+  c.status=document.getElementById('e_status_'+id).value;
+  c.valor=Number(document.getElementById('e_valor_'+id).value)||c.valor;
+  c.seg=document.getElementById('e_seg_'+id).value;
+  c.sistema=document.getElementById('e_sis_'+id).value;
+  c.cnpjs=Number(document.getElementById('e_cnpjs_'+id).value)||1;
+  c.inicio=document.getElementById('e_inicio_'+id).value;
+  c.venc=document.getElementById('e_venc_'+id).value;
+  c.class=document.getElementById('e_class_'+id).value;
+  c.obs=document.getElementById('e_obs_'+id).value;
+  c.contrato=document.getElementById('e_ct_'+id).value;
+  c.link=document.getElementById('e_lk_'+id).value;
+  sv();
+  // feedback visual
+  const btn=event.target;btn.textContent='✅ Salvo!';btn.style.background='#22c55e';
+  setTimeout(()=>{btn.textContent='💾 Salvar Alterações';btn.style.background='';renderC();verC(id);verC(id);},1200);
+}
+
+// ── DEMANDAS ──────────────────────────────────────────────────────
+function salvarDem(){
+  const cliId=document.getElementById('d_cli').value;
+  if(!cliId){document.getElementById('ntfDem').innerHTML='<div class="ntf nwn">Selecione o cliente.</div>';return;}
+  demandas.push({
+    id:Date.now(),cliId:Number(cliId),
+    tipo:document.getElementById('d_tipo').value,
+    prazo:document.getElementById('d_prazo').value,
+    prio:document.getElementById('d_prio').value,
+    resp:document.getElementById('d_resp').value,
+    status:document.getElementById('d_status').value,
+    desc:document.getElementById('d_desc').value,
+    criado:new Date().toISOString()
+  });
+  sv();
+  document.getElementById('ntfDem').innerHTML='<div class="ntf nok">✅ Demanda adicionada!</div>';
+  ['d_prazo','d_desc'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('d_prio').value='normal';
+  document.getElementById('d_status').value='aberta';
+  setTimeout(()=>document.getElementById('ntfDem').innerHTML='',2000);
+  renderDem();pDemFiltros();
+}
+
+function renderDem(){
+  const fc=document.getElementById('dfCli').value;
+  const fs=document.getElementById('dfStatus').value;
+  const fp=document.getElementById('dfPrio').value;
+  const fr=document.getElementById('dfResp').value;
+  let lst=[...demandas].filter(d=>(!fc||d.cliId==fc)&&(!fs||d.status===fs)&&(!fp||d.prio===fp)&&(!fr||d.resp===fr));
+  // ordenar: urgente>hoje>normal, e dentro não-concluído primeiro
+  const pOrd={urgente:0,hoje:1,normal:2};
+  const sOrd={aberta:0,andamento:1,concluido:2};
+  lst.sort((a,b)=>sOrd[a.status]-sOrd[b.status]||pOrd[a.prio]-pOrd[b.prio]||(a.prazo||'').localeCompare(b.prazo||''));
+  const div=document.getElementById('lstDem');
+  if(!lst.length){div.innerHTML='<div style="text-align:center;padding:1.5rem;color:var(--tx3)">Nenhuma demanda encontrada.</div>';return;}
+  div.innerHTML=lst.map(d=>{
+    const c=clientes.find(x=>x.id==d.cliId);
+    const idx=demandas.indexOf(d);
+    const hoje=new Date().toISOString().split('T')[0];
+    const atrasado=d.prazo&&d.prazo<hoje&&d.status!=='concluido';
+    return`<div class="dem ${d.prio}" style="${atrasado?'border-color:#ef4444;background:#fff5f5':''}">
+      <div class="dem-h">
+        <div style="flex:1">
+          <div class="dem-t">${d.tipo} ${atrasado?'<span style="color:#ef4444;font-size:10px">⚠️ Atrasado</span>':''}</div>
+          <div class="dem-sub">${c?c.nome:'?'} ${d.desc?'— '+d.desc:''}</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:3px">${d.prazo?'📅 '+fmtData(d.prazo):''} ${d.resp?'· 👤 '+d.resp:''}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;flex-direction:column;align-items:flex-end">
+          <select class="status-sel" onchange="mudaStatusDem(${idx},this.value)">
+            <option value="aberta"${d.status==='aberta'?' selected':''}>Em aberto</option>
+            <option value="andamento"${d.status==='andamento'?' selected':''}>Em andamento</option>
+            <option value="concluido"${d.status==='concluido'?' selected':''}>Concluída ✓</option>
+          </select>
+          <button onclick="delDem(${idx})" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:14px">🗑 remover</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mudaStatusDem(idx,val){demandas[idx].status=val;sv();renderDem();if(selId)verC(selId)&&verC(selId);}
+function delDem(idx){if(!confirm('Remover demanda?'))return;demandas.splice(idx,1);sv();renderDem();if(selId){verC(selId);verC(selId);}}
+function irNovaDem(cliId){
+  tab('demandas',document.querySelectorAll('.nb')[2]);
+  setTimeout(()=>{document.getElementById('d_cli').value=cliId;},100);
+}
+
+// ── NOVO CLIENTE ──────────────────────────────────────────────────
+function salvarCliente(){
+  const nome=document.getElementById('nn_nome').value.trim();
+  if(!nome){document.getElementById('ntfNovo').innerHTML='<div class="ntf nwn">Informe o nome do cliente.</div>';return;}
+  if(!tiposSel.length){document.getElementById('ntfNovo').innerHTML='<div class="ntf nwn">Selecione ao menos um tipo de serviço.</div>';return;}
+  clientes.push({id:Date.now(),nome,cnpj:document.getElementById('nn_cnpj').value,resp:document.getElementById('nn_resp').value,valor:Number(document.getElementById('nn_valor').value)||0,tipos:[...tiposSel],sistema:document.getElementById('nn_sistema').value,status:document.getElementById('nn_status').value,class:document.getElementById('nn_class').value,seg:document.getElementById('nn_seg').value,inicio:document.getElementById('nn_inicio').value,venc:document.getElementById('nn_venc').value,cnpjs:Number(document.getElementById('nn_cnpjs').value)||1,obs:document.getElementById('nn_obs').value,contrato:document.getElementById('nn_contrato').value,link:document.getElementById('nn_link').value});
+  sv();tiposSel=[];
+  document.getElementById('ntfNovo').innerHTML='<div class="ntf nok">✅ Cliente salvo com sucesso!</div>';
+  setTimeout(()=>tab('clientes',document.querySelectorAll('.nb')[0]),1200);
+}
+function limparNovo(){['nn_nome','nn_cnpj','nn_valor','nn_seg','nn_inicio','nn_venc','nn_obs','nn_contrato','nn_link'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('nn_cnpjs').value=1;tiposSel=[];renderTiposNovo();document.getElementById('ntfNovo').innerHTML='';}
+
+// ── CALC ──────────────────────────────────────────────────────────
+function calc(){
+  const g=id=>Number(document.getElementById(id).value)||0;
+  const p=g('c_p'),r=g('c_r'),b=g('c_b'),a=g('c_a'),ct=g('c_ct'),n=g('c_n'),bo=g('c_bo'),re=g('c_re'),ru=g('c_ru');
+  const cc=Number(document.getElementById('c_cc').value),dep=Number(document.getElementById('c_dep').value);
+  const h=Number(document.getElementById('c_h').value)||121.21;
+  const m=Number(document.getElementById('c_m').value)||1.8;
+  const min=Number(document.getElementById('c_min').value)||3;
+  const mH=min/60;
+  let t=(p+r)*mH+(n+bo)*mH+b*.75+a*.5+ct*.6+re;
+  t*=(1+cc+dep);
+  const base=t*h*m+ru*150;
+  const exc=(Math.max(0,b-2)+Math.max(0,a-1)+Math.max(0,ct-2))*150;
+  ultimoCalc=Math.round((base+exc)/10)*10;
+  const docs=p+r;
+  const pl=docs>150?'⭐⭐⭐ Avançado':docs>75?'⭐⭐ Intermediário':'⭐ Básico';
+  document.getElementById('resCalc').innerHTML=`<div class="res"><div style="font-size:11px;opacity:.7;margin-bottom:2px">Honorário sugerido</div><div class="rv">${fmt(ultimoCalc)}</div><div style="font-size:11px;opacity:.8">${pl} · ${Math.round(t*10)/10}h/mês · ${docs} docs/mês</div></div><div class="krow" style="margin-top:9px"><div class="kpi"><div class="kv">${Math.round(t*10)/10}h</div><div class="kl">Horas/mês</div></div><div class="kpi"><div class="kv">${fmt(Math.round(t*h*m))}</div><div class="kl">Valor base</div></div><div class="kpi"><div class="kv">${fmt(ru*150)}</div><div class="kl">Consultoria</div></div><div class="kpi"><div class="kv">${fmt(exc)}</div><div class="kl">Adicionais</div></div></div>`;
+}
+function usarCalc(){if(!ultimoCalc)return;tab('novo',document.querySelectorAll('.nb')[1]);setTimeout(()=>{document.getElementById('nn_valor').value=ultimoCalc;},100);}
+
+// ── ALFER ─────────────────────────────────────────────────────────
+function renderAlfer(){
+  const fat=t=>clientes.filter(c=>c.status==='ativo'&&(c.tipos||[]).includes(t)).reduce((s,c)=>s+Number(c.valor),0);
+  const tot=clientes.filter(c=>c.status==='ativo').reduce((s,c)=>s+Number(c.valor),0);
+  document.getElementById('kpiAlfer').innerHTML=tipos.map(t=>`<div class="kpi"><div class="kv">${fmt(fat(t))}</div><div class="kl">${t}</div></div>`).join('')+`<div class="kpi" style="border-color:var(--l)"><div class="kv">${fmt(tot)}</div><div class="kl">Total</div></div>`;
+}
+function svAlfer(){document.getElementById('ntfAlfer').innerHTML='<div class="ntf nok">✅ Salvo.</div>';setTimeout(()=>document.getElementById('ntfAlfer').innerHTML='',2000);}
+
+// ── MAPEAMENTO ────────────────────────────────────────────────────
+function sincMapeamento(){
+  const cnpjs=Number(document.getElementById('m_cnpjs').value)||1;
+  if(cnpjs>1){document.getElementById('c_b').value=cnpjs*2;calc();}
+}
+function usarMapeamento(){
+  const cnpjs=Number(document.getElementById('m_cnpjs').value)||1;
+  const cli=Number(document.getElementById('m_clientes').value)||0;
+  // estima contas a pagar/receber baseado no nº de clientes
+  if(cli>0){
+    document.getElementById('c_p').value=Math.round(cli*0.8);
+    document.getElementById('c_r').value=Math.round(cli*1.2);
+  }
+  if(cnpjs>1){
+    document.getElementById('c_b').value=cnpjs*2;
+    document.getElementById('nn_cnpjs').value=cnpjs;
+  }
+  const nome=document.getElementById('m_nome').value;
+  if(nome)document.getElementById('nn_nome').value=nome;
+  calc();
+  // scroll até calculadora
+  document.querySelector('#p-calc .card:last-of-type').scrollIntoView({behavior:'smooth'});
+}
+function limparMapeamento(){
+  ['m_nome','m_cnpjs','m_fat','m_clientes','m_func','m_cont_nome','m_cont_tel','m_cont_email','m_dores','m_obs'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('m_regime').value='';
+  document.getElementById('m_sistema_cont').value='';
+  document.getElementById('resumoMap').style.display='none';
+}
+function gerarResumo(){
+  const nome=document.getElementById('m_nome').value||'Não informado';
+  const regime=document.getElementById('m_regime').value||'Não informado';
+  const cnpjs=document.getElementById('m_cnpjs').value||'1';
+  const fat=document.getElementById('m_fat').value;
+  const cli=document.getElementById('m_clientes').value||'Não informado';
+  const func=document.getElementById('m_func').value||'Não informado';
+  const cNome=document.getElementById('m_cont_nome').value||'Não informado';
+  const cTel=document.getElementById('m_cont_tel').value||'Não informado';
+  const cEmail=document.getElementById('m_cont_email').value||'Não informado';
+  const sis=document.getElementById('m_sistema_cont').value||'Não informado';
+  const dores=document.getElementById('m_dores').value||'—';
+  const obs=document.getElementById('m_obs').value||'—';
+  const div=document.getElementById('resumoMap');
+  div.style.display='block';
+  div.innerHTML=`<div style="font-size:13px;font-weight:700;color:var(--v);margin-bottom:10px">📋 Resumo do Mapeamento — ${nome}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px">
+      <div><span style="color:var(--tx3)">Regime Tributário:</span> <b>${regime}</b></div>
+      <div><span style="color:var(--tx3)">Nº de CNPJs:</span> <b>${cnpjs}</b></div>
+      <div><span style="color:var(--tx3)">Faturamento médio:</span> <b>${fat?fmt(fat):'Não informado'}</b></div>
+      <div><span style="color:var(--tx3)">Clientes ativos:</span> <b>${cli}</b></div>
+      <div><span style="color:var(--tx3)">Funcionários:</span> <b>${func}</b></div>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)">
+      <div style="font-weight:700;color:var(--v);margin-bottom:5px">📞 Contabilidade Atual</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+        <div><span style="color:var(--tx3)">Contador:</span> <b>${cNome}</b></div>
+        <div><span style="color:var(--tx3)">Telefone:</span> <b>${cTel}</b></div>
+        <div><span style="color:var(--tx3)">E-mail:</span> <b>${cEmail}</b></div>
+        <div><span style="color:var(--tx3)">Sistema:</span> <b>${sis}</b></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--bd)">
+      <div><span style="color:var(--tx3)">😣 Dores:</span> ${dores}</div>
+      <div style="margin-top:4px"><span style="color:var(--tx3)">📝 Obs:</span> ${obs}</div>
+    </div>
+    <div style="margin-top:10px;font-weight:700;color:var(--v)">💰 Honorário calculado: <span style="color:var(--l);font-size:16px">${ultimoCalc?fmt(ultimoCalc):'Calcule abaixo ↓'}</span></div>`;
+}
+
+
+let selEq=null;
+function renderEq(){
+  const div=document.getElementById('lstEq');if(!equipe.length){div.innerHTML='<p style="color:var(--tx3);font-size:13px;padding:8px 0">Nenhum membro cadastrado.</p>';return;}
+  const vcMap={CLT:'#dcfce7;color:#166534',PJ:'#dbeafe;color:#1e40af','Estágio':'#fef3c7;color:#92400e','Sócia':'#f3e4ff;color:#6b21a8','':'#f5f5f5;color:#888'};
+  div.innerHTML=equipe.map((e,i)=>{
+    const ini=e.nome.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const idade=e.nasc?Math.floor((Date.now()-new Date(e.nasc+'T12:00'))/(365.25*24*3600*1e3)):'';
+    const isOpen=selEq===i;
+    return`<div style="background:var(--card);border:${isOpen?'2px solid var(--v)':'1px solid var(--bd)'};border-radius:11px;margin-bottom:8px;overflow:hidden">
+      <!-- CABEÇALHO -->
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer" onclick="toggleEq(${i})">
+        <div class="eavt">${ini}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px;color:var(--v)">${e.nome}</div>
+          <div style="font-size:11px;color:var(--tx3)">${e.cargo} ${e.vinculo?'· '+e.vinculo:''}</div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center">
+          ${e.sal?`<span class="bdg gn">${fmt(e.sal)}</span>`:''}
+          ${idade?`<span style="font-size:10px;color:var(--tx3)">${idade}a</span>`:''}
+          <span style="color:var(--tx3);font-size:16px">${isOpen?'▲':'▼'}</span>
+        </div>
+      </div>
+      <!-- EDIÇÃO INLINE -->
+      ${isOpen?`<div style="padding:0 14px 14px;border-top:1px solid var(--bd)">
+        <div style="margin-top:12px" class="g2">
+          <div class="f"><label>Nome Completo</label><input class="edit-field" id="eq_n_${i}" value="${e.nome}"></div>
+          <div class="f"><label>Cargo</label><select class="edit-field" id="eq_c_${i}"><option${e.cargo==='Analista Financeiro'?' selected':''}>Analista Financeiro</option><option${e.cargo==='Assistente Financeiro'?' selected':''}>Assistente Financeiro</option><option${e.cargo==='Auxiliar Financeiro'?' selected':''}>Auxiliar Financeiro</option><option${e.cargo==='Analista DP'?' selected':''}>Analista DP</option><option${e.cargo==='Coordenadora'?' selected':''}>Coordenadora</option><option${e.cargo==='Sócia'?' selected':''}>Sócia</option></select></div>
+          <div class="f"><label>Vínculo</label><select class="edit-field" id="eq_v_${i}"><option value="CLT"${e.vinculo==='CLT'?' selected':''}>CLT</option><option value="PJ"${e.vinculo==='PJ'?' selected':''}>PJ</option><option value="Estágio"${e.vinculo==='Estágio'?' selected':''}>Estágio</option><option value="Sócia"${e.vinculo==='Sócia'?' selected':''}>Sócia</option><option value=""${!e.vinculo?' selected':''}>— Não informado —</option></select></div>
+          <div class="f"><label>Salário / Honorário (R$)</label><input class="edit-field" type="number" id="eq_sal_${i}" value="${e.sal||''}"></div>
+          <div class="f"><label>Data de Nascimento</label><input class="edit-field" type="date" id="eq_nasc_${i}" value="${e.nasc||''}"></div>
+          <div class="f"><label>Data de Admissão</label><input class="edit-field" type="date" id="eq_adm_${i}" value="${e.adm||''}"></div>
+          <div class="f"><label>CPF</label><input class="edit-field" id="eq_cpf_${i}" value="${e.cpf||''}" placeholder="000.000.000-00"></div>
+          <div class="f"><label>E-mail</label><input class="edit-field" id="eq_em_${i}" value="${e.email||''}" placeholder="nome@alfer.com.br"></div>
+          <div class="f"><label>WhatsApp</label><input class="edit-field" id="eq_wp_${i}" value="${e.wpp||''}" placeholder="(62) 9..."></div>
+          <div class="f"><label>Clientes sob Responsabilidade</label><input class="edit-field" id="eq_cli_${i}" value="${e.cli||''}"></div>
+        </div>
+        <div class="f" style="margin-top:8px"><label>Observações / Benefícios</label><textarea class="edit-field" id="eq_obs_${i}" rows="2">${e.obs||''}</textarea></div>
+        <div class="br" style="margin-top:10px">
+          <button class="btn bv" onclick="svEqInline(${i})">💾 Salvar Alterações</button>
+          <button class="btn bd2" onclick="delFunc(${i})">🗑 Remover</button>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleEq(i){selEq=selEq===i?null:i;renderEq();}
+function svEqInline(i){
+  equipe[i].nome=document.getElementById('eq_n_'+i).value.trim()||equipe[i].nome;
+  equipe[i].cargo=document.getElementById('eq_c_'+i).value;
+  equipe[i].vinculo=document.getElementById('eq_v_'+i).value;
+  equipe[i].sal=Number(document.getElementById('eq_sal_'+i).value)||0;
+  equipe[i].nasc=document.getElementById('eq_nasc_'+i).value;
+  equipe[i].adm=document.getElementById('eq_adm_'+i).value;
+  equipe[i].cpf=document.getElementById('eq_cpf_'+i).value;
+  equipe[i].email=document.getElementById('eq_em_'+i).value;
+  equipe[i].wpp=document.getElementById('eq_wp_'+i).value;
+  equipe[i].cli=document.getElementById('eq_cli_'+i).value;
+  equipe[i].obs=document.getElementById('eq_obs_'+i).value;
+  sv();
+  const btn=event.target;btn.textContent='✅ Salvo!';btn.style.background='#22c55e';
+  setTimeout(()=>{btn.textContent='💾 Salvar Alterações';btn.style.background='';renderEq();},1200);
+}
+function svFunc(){
+  const nome=document.getElementById('e_n').value.trim();
+  if(!nome){document.getElementById('ntfEq').innerHTML='<div class="ntf nwn">Informe o nome.</div>';return;}
+  equipe.push({nome,cargo:document.getElementById('e_c').value,vinculo:document.getElementById('e_v').value,nasc:document.getElementById('e_nasc').value,adm:document.getElementById('e_adm').value,cpf:document.getElementById('e_cpf').value,email:document.getElementById('e_em').value,wpp:document.getElementById('e_wp').value,sal:Number(document.getElementById('e_sal').value)||0,cli:document.getElementById('e_cli').value,obs:document.getElementById('e_obs').value});
+  sv();document.getElementById('ntfEq').innerHTML='<div class="ntf nok">✅ '+nome+' adicionada!</div>';
+  ['e_n','e_cpf','e_em','e_wp','e_sal','e_cli','e_nasc','e_adm','e_obs'].forEach(id=>{document.getElementById(id).value='';});
+  renderEq();
+}
+function delFunc(i){if(!confirm('Remover '+equipe[i].nome+'?'))return;equipe.splice(i,1);selEq=null;sv();renderEq();}
+
+// ── INIT ──────────────────────────────────────────────────────────
+pFiltros();pSelects();renderC();calc();renderAlfer();renderEq();renderRespBtns();
+document.getElementById('topFat').textContent=fmt(clientes.filter(c=>c.status==='ativo').reduce((s,c)=>s+Number(c.valor),0))+'/mês';
+</script>
+</body>
+</html>
 
